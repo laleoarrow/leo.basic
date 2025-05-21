@@ -46,9 +46,9 @@ leo_log <- function(..., level = "info") {
                               "danger" = cli::col_red(timestamp))    # red
   formatted_message <- paste(timestamp_colored, msg)
   switch(level,
-         "info"    = cli::cli_alert_info(formatted_message),
-         "success" = cli::cli_alert_success(formatted_message),
-         "warning" = cli::cli_alert_warning(formatted_message),
-         "danger"  = cli::cli_alert_danger(formatted_message)
+         "info"    = cli::cli_alert_info(formatted_message, .envir = parent.frame()),
+         "success" = cli::cli_alert_success(formatted_message, .envir = parent.frame()),
+         "warning" = cli::cli_alert_warning(formatted_message, .envir = parent.frame()),
+         "danger"  = cli::cli_alert_danger(formatted_message, .envir = parent.frame())
   )
 }
