@@ -38,18 +38,19 @@ leo_message <- function(..., color = "31", return = FALSE) {
 #' leo_log("Potential issue detected.", level = "warning")
 #' leo_log("Error occurred during processing!", level = "danger")
 leo_log <- function(..., level = "info", verbose = TRUE) {
-  if (verbose == FALSE) return(invisible())
-  msg <- paste(..., collapse = " "); timestamp <- paste0("[", format(Sys.time(), '%H:%M'),  "]")
-  timestamp_colored <- switch(level,
-                              "info" = cli::col_cyan(timestamp),     # cyan
-                              "success" = cli::col_green(timestamp), # green
-                              "warning" = cli::col_yellow(timestamp),# yellow
-                              "danger" = cli::col_red(timestamp))    # red
-  formatted_message <- paste(timestamp_colored, msg)
-  switch(level,
-         "info"    = cli::cli_alert_info(formatted_message, .envir = parent.frame()),
-         "success" = cli::cli_alert_success(formatted_message, .envir = parent.frame()),
-         "warning" = cli::cli_alert_warning(formatted_message, .envir = parent.frame()),
-         "danger"  = cli::cli_alert_danger(formatted_message, .envir = parent.frame())
-  )
+  if (verbose) {
+    msg <- paste(..., collapse = " "); timestamp <- paste0("[", format(Sys.time(), '%H:%M'),  "]")
+    timestamp_colored <- switch(level,
+                                "info" = cli::col_cyan(timestamp),     # cyan
+                                "success" = cli::col_green(timestamp), # green
+                                "warning" = cli::col_yellow(timestamp),# yellow
+                                "danger" = cli::col_red(timestamp))    # red
+    formatted_message <- paste(timestamp_colored, msg)
+    switch(level,
+           "info"    = cli::cli_alert_info(formatted_message, .envir = parent.frame()),
+           "success" = cli::cli_alert_success(formatted_message, .envir = parent.frame()),
+           "warning" = cli::cli_alert_warning(formatted_message, .envir = parent.frame()),
+           "danger"  = cli::cli_alert_danger(formatted_message, .envir = parent.frame())
+    )
+  }
 }
