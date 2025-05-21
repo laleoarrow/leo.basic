@@ -4,14 +4,14 @@
 \alias{leo_log}
 \title{Log Messages with Timestamps}
 \usage{
-leo_log(..., level = "info")
+leo_log(..., level = "info", verbose = TRUE)
 }
 \arguments{
 \item{...}{The message string to log, which will be pasted together.}
 
 \item{level}{The log level. Options are \code{"info"}, \code{"success"}, \code{"warning"}, and \code{"danger"}.}
 
-\item{levels}{All levels that is now supported.}
+\item{verbose}{in case you want to turn the info log off, set it to FALSE.}
 }
 \value{
 No return value. Outputs a formatted log message with a timestamp.

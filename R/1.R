@@ -26,7 +26,7 @@ leo_message <- function(..., color = "31", return = FALSE) {
 #'
 #' @param ... The message string to log, which will be pasted together.
 #' @param level The log level. Options are `"info"`, `"success"`, `"warning"`, and `"danger"`.
-#' @param levels All levels that is now supported.
+#' @param verbose in case you want to turn the info log off, set it to FALSE.
 #'
 #' @return No return value. Outputs a formatted log message with a timestamp.
 #' @export
@@ -37,7 +37,8 @@ leo_message <- function(..., color = "31", return = FALSE) {
 #' leo_log("Task completed successfully!", level = "success")
 #' leo_log("Potential issue detected.", level = "warning")
 #' leo_log("Error occurred during processing!", level = "danger")
-leo_log <- function(..., level = "info") {
+leo_log <- function(..., level = "info", verbose = TRUE) {
+  if (verbose == FALSE) return(invisible())
   msg <- paste(..., collapse = " "); timestamp <- paste0("[", format(Sys.time(), '%H:%M'),  "]")
   timestamp_colored <- switch(level,
                               "info" = cli::col_cyan(timestamp),     # cyan
