@@ -39,7 +39,7 @@ leo_message <- function(..., color = "31", return = FALSE) {
 #' leo_log("Error occurred during processing!", level = "danger")
 leo_log <- function(..., level = "info", verbose = TRUE) {
   if (verbose == FALSE) return(invisible())
-  msg <- paste(..., collapse = " "); timestamp <- paste0("[", format(Sys.time(), '%H:%M'),  "]")
+  msg <- paste(..., collapse = " "); timestamp <- paste0("[", format(Sys.time(), '%H:%M:%S'),  "]")
   timestamp_colored <- switch(level,
                               "info" = cli::col_cyan(timestamp),     # cyan
                               "success" = cli::col_green(timestamp), # green
@@ -92,7 +92,7 @@ leo_more_color <- function(color_set, expected_num) {
 #' @param legend_text_size Numeric; legend text size (default 9).
 #' @param axis_title_size Numeric; axis title size (default 10).
 #' @param axis_text_size Numeric; axis text size (default 8).
-#' @param type Character; "object" (default) to return theme, or "console" to print copyable code.
+#' @param type Character; "object" to return theme, or "console" (default) to print copyable code.
 #'
 #' @importFrom ggplot2 theme element_text element_blank
 #' @export
@@ -101,16 +101,16 @@ leo_more_color <- function(color_set, expected_num) {
 #' library(ggplot2)
 #' # Add to a plot
 #' ggplot(mtcars, aes(wt, mpg)) + geom_point() +
-#'   leo_ggtheme()
+#'   leo_theme()
 #' # Print theme code
-#' leo_ggtheme(type = "console")
-leo_ggtheme <- function(
+#' leo_theme(type = "console")
+leo_theme <- function(
     plot_title_size   = 14,
     legend_title_size = 10,
     legend_text_size  = 9,
     axis_title_size   = 10,
     axis_text_size    = 8,
-    type              = c("object", "console")
+    type              = c("console", "object")
 ) {
   type <- match.arg(type)
   elems <- list(
