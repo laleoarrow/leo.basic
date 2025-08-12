@@ -1,4 +1,4 @@
-#' Give Messages with my color
+#' Give messages with my color
 #'
 #' @param ... The messages you wanna messgae, which will be pasted together
 #' @param color Str. Preferred color. Default is yellow.
@@ -18,9 +18,9 @@ leo_message <- function(..., color = "31", return = FALSE) {
   message(formatted_message)
 }
 
-#' Log Messages with Timestamps
+#' Log messages with time stamps
 #'
-#' Logs messages with timestamps
+#' Logs messages with time stamps
 #' The messages are styled using the `cli` package for enhanced readability.
 #' This function can not deal with {} function in the `cli` package.
 #'
@@ -83,9 +83,9 @@ leo_more_color <- function(color_set, expected_num) {
   colorRampPalette(color_set)(expected_num)
 }
 
-#' Custom ggplot2 Theme
+#' Custom ggplot2 theme
 #'
-#' A concise ggplot2 theme with nature-style sizing and black fonts.
+#' I often forget my favorite ggplot theme settings, so I write this to reminds myself.
 #'
 #' @param plot_title_size Numeric; title font size (default 14).
 #' @param legend_title_size Numeric; legend title font size (default 10).
@@ -119,11 +119,13 @@ leo_theme <- function(
     sprintf("    legend.text     = element_text(size = %s, color = 'black')", legend_text_size),
     sprintf("    axis.title      = element_text(size = %s, face = 'bold', color = 'black')", axis_title_size),
     sprintf("    axis.text       = element_text(size = %s, color = 'black')", axis_text_size),
-            "    axis.title.x    = element_blank()",
-            "    axis.text.x     = element_blank()",
-            "    axis.ticks.x    = element_blank()",
-            "    panel.grid.minor = element_blank()",
-            "    legend.position = 'right'"
+    "    axis.title.x    = element_blank()",
+    "    axis.text.x     = element_blank()",
+    "    axis.ticks.x    = element_blank()",
+    "    panel.grid.minor = element_blank()",
+    "    legend.position = 'right'",
+    "    legend.direction = 'vertical'",
+    "    guides(color = guide_colorbar(frame.colour = 'black', ticks = FALSE))"
   )
   if (type == "console") {
     cat("theme(\n")
@@ -141,7 +143,61 @@ leo_theme <- function(
     axis.text.x      = ggplot2::element_blank(),
     axis.ticks.x     = ggplot2::element_blank(),
     panel.grid.minor = ggplot2::element_blank(),
-    legend.position  = "right"
+    legend.position  = "right",
+    legend.background = ggplot2::element_blank()
   )
 }
 
+#' Intelligent Elapsed-Time Formatter
+#'
+#' Compute and format the time difference between **now** and `start_time`,
+#' choosing the most appropriate unit automatically:
+#' * `< 1 s`    → **milliseconds (ms)**
+#' * `< 60 s`   → **seconds (sec)**
+#' * `< 1 h`    → **minutes (min)**
+#' * `< 1 day`  → **hours (hr)**
+#' * `< 1 week` → **days (day)**
+#' * `< 1 month`→ **weeks (wk)**
+#' * `< 1 year` → **months (mon)**
+#' * otherwise → **years (yr)**
+#'
+#' @param start_time POSIXct. output from `Sys.time()`.
+#' @param digits     Integer. digits to keep (defaut: 2).
+#' @param return     Logical. if TRUE, only return the calculated results.
+#'
+#' @return
+#' @examples
+#' t0 <- Sys.time()
+#' Sys.sleep(0.123)
+#' leo_time_elapsed(t0) # → [12:34:56] Elapsed 125 ms
+#'
+#' t1 <- Sys.time()
+#' Sys.sleep(3.5)
+#' leo_time_elapsed(t1) # → [12:35:00] Elapsed 3.5 sec
+#'
+#' # Capture string without printing
+#' t2 <- Sys.time(); Sys.sleep(61)
+#' elapsed_str <- leo_time_elapsed(t2, return = TRUE)
+#' print(elapsed_str) # "1.08 min"
+#' @export
+leo_time_elapsed <- function(start_time, digits = 2, return = FALSE) {
+  stopifnot(inherits(start_time, "POSIXct"))
+  secs <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
+  # Breakpoints: 1s, 1m, 1h, 1d, 1w, 1mo (~30d), 1y (~365.25d)
+  brks <- c(1, 60, 3600, 86400, 604800, 2592000, 31557600)
+  idx  <- findInterval(secs, brks) + 1
+  fmt  <- paste0("%.", digits, "f %s")
+  out  <- switch(idx,
+                 sprintf("%.0f ms", 1000 * secs),      # ms
+                 sprintf(fmt, secs,            "sec"), # sec
+                 sprintf(fmt, secs / 60,       "min"), # min
+                 sprintf(fmt, secs / 3600,     "hr"),  # hr
+                 sprintf(fmt, secs / 86400,    "day"), # day
+                 sprintf(fmt, secs / 604800,   "wk"),  # week
+                 sprintf(fmt, secs / 2592000,  "mon"), # month
+                 sprintf(fmt, secs / 31557600, "yr")   # year
+  )
+  if (return) return(invisible(out))
+  leo_log("Elapsed", out, level = "success")
+  invisible(out)
+}
