@@ -2,7 +2,7 @@
 % Please edit documentation in R/1.R
 \name{leo_theme}
 \alias{leo_theme}
-\title{Custom ggplot2 Theme}
+\title{Custom ggplot2 theme}
 \usage{
 leo_theme(
   plot_title_size = 14,
@@ -27,7 +27,7 @@ leo_theme(
 \item{type}{Character; "object" to return theme, or "console" (default) to print copyable code.}
 }
 \description{
-A concise ggplot2 theme with nature-style sizing and black fonts.
+I often forget my favorite ggplot theme settings, so I write this to reminds myself.
 }
 \examples{
 library(ggplot2)

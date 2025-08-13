@@ -165,7 +165,7 @@ leo_theme <- function(
 #' @param digits     Integer. digits to keep (defaut: 2).
 #' @param return     Logical. if TRUE, only return the calculated results.
 #'
-#' @return
+#' @return If `return = FALSE` (default), prints the elapsed time in a formatted string
 #' @examples
 #' t0 <- Sys.time()
 #' Sys.sleep(0.123)

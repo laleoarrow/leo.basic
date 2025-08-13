@@ -2,7 +2,7 @@
 % Please edit documentation in R/1.R
 \name{leo_log}
 \alias{leo_log}
-\title{Log Messages with Timestamps}
+\title{Log messages with time stamps}
 \usage{
 leo_log(..., level = "info", verbose = TRUE)
 }
@@ -17,7 +17,7 @@ leo_log(..., level = "info", verbose = TRUE)
 No return value. Outputs a formatted log message with a timestamp.
 }
 \description{
-Logs messages with timestamps
+Logs messages with time stamps
 The messages are styled using the \code{cli} package for enhanced readability.
 This function can not deal with {} function in the \code{cli} package.
 }

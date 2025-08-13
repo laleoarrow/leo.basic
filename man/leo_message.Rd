@@ -2,7 +2,7 @@
 % Please edit documentation in R/1.R
 \name{leo_message}
 \alias{leo_message}
-\title{Give Messages with my color}
+\title{Give messages with my color}
 \usage{
 leo_message(..., color = "31", return = FALSE)
 }
@@ -15,7 +15,7 @@ Options are "31" (red), "32" (green), "34" (blue), "95" (light purple)...}
 \item{return}{Logical. If TRUE, returns the formatted string. If FALSE (Default), prints directly.}
 }
 \description{
-Give Messages with my color
+Give messages with my color
 }
 \examples{
 leo_message("This is a red message", color = "31")
