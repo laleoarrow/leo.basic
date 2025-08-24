@@ -16,11 +16,11 @@ ORA_GO(gene, simplify = T)
 
 GSEA_GO(geneList, simplify = T)
 
-ORA_KEGG(gene, input = "SYMBOL", ...)
+ORA_KEGG(gene, input = "SYMBOL")
 
 GSEA_KEGG(geneList, input = "SYMBOL")
 
-ORA_MKEGG(gene, input = "SYMBOL", ...)
+ORA_MKEGG(gene, input = "SYMBOL")
 
 GSEA_MKEGG(geneList, input = "SYMBOL")
 

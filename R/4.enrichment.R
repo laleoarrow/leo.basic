@@ -1,4 +1,4 @@
-# ======== enrichment helper (one Rd page) ================
+# ======== enrichment helper ================
 #' Enrichment helpers
 #' @name enrichment_helper
 #' @title Enrichment helpers
@@ -77,11 +77,12 @@ prep_GSEA_geneList <- function(geneList_sym) {
     dplyr::slice_max(order_by = abs(score), n = 1, with_ties = FALSE, na_rm = TRUE) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(dplyr::desc(score))
-  gl <- df$score; names(gl) <- df$ENTREZID; gl
+  gl <- df$score; names(gl) <- df$ENTREZID
+  return(gl)
 }
 
 
-# ======== enrichment individual (one Rd page) ============
+# ======== enrichment individual ============
 #' Enrichment wrappers (individual)
 #' @name enrichment_individual
 #' @title Enrichment wrappers (individual)
@@ -161,20 +162,20 @@ GSEA_GO <- function(geneList, simplify = T) {
 #'                      species    = "hsa",
 #'                      limit      = list(gene=max(abs(geneList)), cpd=1))
 #' '''
-ORA_KEGG <- function(gene, input = "SYMBOL", ...) {
+ORA_KEGG <- function(gene, input = "SYMBOL") {
   if (input == "SYMBOL") {
     gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)$ENTREZID
     gene <- unique(gene)
   }
   kk <- clusterProfiler::enrichKEGG(gene = gene,
                                     organism = 'hsa',
+                                    minGSSize = 10,
                                     pvalueCutoff = 0.05)
   return(kk)
 }
 #' @rdname enrichment_individual
 #' @param geneList Named numeric vector (SYMBOL or ENTREZID per input)
 #' @param input "SYMBOL" or "ENTREZID"
-#' @param organism KEGG organism code, default "hsa"
 #' @return gseaResult
 #' @export
 #' @importFrom clusterProfiler gseKEGG
@@ -182,7 +183,7 @@ GSEA_KEGG <- function(geneList, input = "SYMBOL"){
   if (input == "SYMBOL") geneList <- prep_GSEA_geneList(geneList)
   kk <- gseKEGG(geneList = geneList,
                 organism = 'hsa',
-                minGSSize = 120,
+                minGSSize = 10,
                 pvalueCutoff = 0.05,
                 verbose = FALSE)
   return(kk)
@@ -192,12 +193,11 @@ GSEA_KEGG <- function(geneList, input = "SYMBOL"){
 #' @rdname enrichment_individual
 #' @param gene SYMBOL or ENTREZID vector depending on input
 #' @param input "SYMBOL" or "ENTREZID"
-#' @param organism KEGG organism code, default "hsa"
 #' @return enrichResult
 #' @export
 #' @importFrom clusterProfiler enrichMKEGG bitr
 #' @importFrom org.Hs.eg.db org.Hs.eg.db
-ORA_MKEGG <- function(gene, input = "SYMBOL", ...) {
+ORA_MKEGG <- function(gene, input = "SYMBOL") {
   if (input == "SYMBOL") {
     gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)$ENTREZID
     gene <- unique(gene)
@@ -211,7 +211,6 @@ ORA_MKEGG <- function(gene, input = "SYMBOL", ...) {
 #' @rdname enrichment_individual
 #' @param geneList Named numeric vector (SYMBOL or ENTREZID per input)
 #' @param input "SYMBOL" or "ENTREZID"
-#' @param organism KEGG organism code, default "hsa"
 #' @return gseaResult
 #' @export
 #' @importFrom clusterProfiler gseMKEGG
@@ -305,19 +304,19 @@ leo_enrich <- function(gene, geneList, simplify =T, input = "SYMBOL",
     for (bg in background) {
       i <- i + 1
       leo_log("Round {i}: Processing {m} for {bg} background...")
-      res_list[[paste(m, bg, sep = "_")]] <- switch(
+      res_list[[paste(m, bg, sep = "_")]] <- tryCatch(switch(
         m,
         ORA = switch(bg,
                      GO       = ORA_GO(gene, simplify),
-                     KEGG.    = ORA_KEGG(gene, input),
-                     MKEGG.   = ORA_MKEGG(gene, input),
+                     KEGG     = ORA_KEGG(gene, input),
+                     MKEGG    = ORA_MKEGG(gene, input),
                      Reactome = ORA_Reactome(gene, input)),
         GSEA = switch(bg,
                       GO       = GSEA_GO(geneList, simplify),
-                      KEGG.    = GSEA_KEGG(geneList, input),
+                      KEGG     = GSEA_KEGG(geneList, input),
                       MKEGG    = GSEA_MKEGG(geneList, input),
                       Reactome = GSEA_Reactome(geneList, input))
-      )
+      ), error = function(e) { leo_log("Enrichment failed: {e$message}", level = "danger"); NULL })
     }
   }
   return(res_list)
