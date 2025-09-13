@@ -130,3 +130,53 @@ plot_group_numbers <- function(df, group, number,
   }
   leo_log("Plotting complete.", level = "success"); return(p)
 }
+
+
+#' Generate a discrete color palette (expanded from a base panel)
+#'
+#' @description Return \code{n} distinct colors or a named vector for \code{levels}. Uses a fixed base panel and expands smoothly if more colors are needed.
+#' @param levels character; category names. If provided, output is named with \code{levels}. If NULL, use \code{n}.
+#' @param n integer; number of colors to return when \code{levels} is NULL.
+#' @param base_panel named character; optional seed palette (hex). Defaults to an internal panel.
+#' @return character vector of hex colors; named if \code{levels} is provided.
+#' @examples
+#' leo_discrete_color(n = 8)
+#' leo_discrete_color(levels = c("Brain","Liver","Heart"))
+#' @export
+#' @importFrom grDevices colorRampPalette
+#' @importFrom cli cli_alert_info cli_alert_success
+leo_discrete_color <- function(levels = NULL, n = NULL, base_panel = NULL) {
+  # -- validate input
+  if (is.null(levels) && is.null(n)) stop("Provide either `levels` or `n`.")
+  if (!is.null(levels)) {
+    if (!is.character(levels)) stop("`levels` must be character.")
+    n <- length(levels)
+  } else {
+    if (!is.numeric(n) || length(n) != 1 || n < 1) stop("`n` must be a positive integer.")
+    n <- as.integer(n)
+  }
+
+  # -- base palette (your panel)
+  if (is.null(base_panel)) {
+    base_panel <- c(
+      a1 = "#5BC0EB", a2 = "#9BC53D", a3 = "#C3423F", a4 = "#FDE74C",
+      c1 = "#5A7B8F", c2 = "#EE4C97", c3 = "#3D806F", c4 = "#A08634",
+      c5 = "#F37C95", c6 = "#608541", c7 = "#7D4E57", c8 = "#BC3C29",
+      c9 = "#958056", c10 = "#9FAFA3", c11 = "#6F99AD", c12 = "#0072B5",
+      c13 = "#CFC59A", c14 = "#E18727", c15 = "#FFDC91", c16 = "#718DAE",
+      c17 = "#7876B1", c18 = "#F9AC93", c19 = "#3E6086", c20 = "#20854E",
+      c21 = "#7581AF", c22 = "#4A7985"
+    )
+  }
+  base_vals <- unname(base_panel)
+
+  # -- generate palette (no repetition; expand smoothly when needed)
+  cli::cli_alert_info("Building discrete palette: need {n}, base size {length(base_vals)}")
+  if (n <= length(base_vals)) pal <- base_vals[seq_len(n)] else pal <- grDevices::colorRampPalette(base_vals)(n)
+
+  # -- name by levels if provided
+  if (!is.null(levels)) names(pal) <- levels
+
+  cli::cli_alert_success("Palette ready: {n} colors")
+  pal
+}
