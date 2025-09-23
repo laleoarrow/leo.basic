@@ -1,6 +1,71 @@
-#' @title Plot numeric values by group with jitter / beeswarm, color / shape / size mapping
-#' @description Draw a grouped scatter of numeric values with optional jitter /
-#'   beeswarm arrangement, color / shape / size encoding, plus optional mean indicator.
+#' Plot pie/ring via ggpie with install hint
+#'
+#' @param x Numeric vector: values (type='num') or ratios (type='ratio').
+#' @param colors Vector of fill colors; NULL uses package palette.
+#' @param type "num" or "ratio" for the meaning of x.
+#' @param ring_ratio Visible ring thickness in [0,1]; 1=full pie (no hole).
+#' @param annotation_type "in" or "out" for label position.
+#' @param label_type "horizon" or "circle" for label style.
+#' @param label_size Label size.
+#' @return ggplot object.
+#'
+#' @importFrom ggpie ggpie ggdonut
+#' @importFrom ggsci pal_npg
+#' @importFrom grDevices adjustcolor
+#' @examples
+#' plot_pie(c(A=30,B=20,C=50), type="num", ring_ratio=1, annotation_type="in")
+#' plot_pie(c(A=0.2,B=0.3,C=0.5), type="ratio", ring_ratio=0.6, annotation_type="out", label_type="horizon",
+#'          colors=c("#66c2a5","#fc8d62","#8da0cb"))
+#' plot_pie(c(A=30,B=20,C=50), color_alpha = 0.8, type="num", ring_ratio=0.6, annotation_type="out")
+#' @export
+plot_pie <- function(x, colors=NULL, color_alpha = 1, type=c("num","ratio"), ring_ratio=1,
+                     annotation_type=c("in","out"), label_type=c("horizon","circle"), label_size=4) {
+  leo_log("Tutorial: https://showteeth.github.io/ggpie/")
+  # --- package check (print install snippet if missing) ---
+  if (!requireNamespace("ggpie", quietly = TRUE)) {
+    cat("# install.packages('remotes')  # if not installed\n",
+        "install.packages('ggpie')\n",
+        "# or\n",
+        "remotes::install_github('showteeth/ggpie')\n", sep = "")
+    return(leo_log("Package 'ggpie' not found", level="danger"))
+  }
+  if (is.null(colors)) colors <- ggsci::pal_npg("nrc")(length(x))
+  if (color_alpha < 1) colors <- grDevices::adjustcolor(colors, alpha.f = color_alpha)
+  # --- validate input ---
+  type <- match.arg(type); annotation_type <- match.arg(annotation_type); label_type <- match.arg(label_type)
+  if (!is.numeric(x) || any(is.na(x)) || any(x < 0)) stop("`x` must be non-negative numeric.")
+  if (sum(x) == 0) stop("Sum of `x` must be > 0.")
+  if (is.null(names(x))) names(x) <- paste0("C", seq_along(x))
+  if (!is.null(colors) && length(colors) != length(x)) {leo_log("`colors` length != length(x); use package palette.", level="warning"); colors <- NULL}
+
+  # --- build df for ggpie/ggdonut ---
+  # ggpie uses a data.frame with 'group' and 'count' (even if you conceptually pass ratios)
+  df <- data.frame(group = names(x), count = as.numeric(x), stringsAsFactors = FALSE)
+  label_info <- if (type == "num") "all" else "ratio"
+
+  # --- route: pie vs donut (ring_ratio -> r0,r1) ---
+  ring_ratio <- max(0, min(1, ring_ratio)); r0 <- 1 - ring_ratio; r1 <- 1
+  leo_log("Plot {ifelse(ring_ratio>=1,'pie','donut')}: n={nrow(df)}, type={type}, labels={label_info}, pos={annotation_type}, style={label_type}, ring_ratio={ring_ratio}")
+
+  if (ring_ratio >= 1) {
+    p <- ggpie::ggpie(data = df, group_key = "group", count_type = "count",
+                      fill_color = colors, label_info = label_info,
+                      label_type = label_type, label_pos = annotation_type,
+                      label_size = label_size)
+  } else {
+    p <- ggpie::ggdonut(data = df, group_key = "group", count_type = "count",
+                        fill_color = colors, label_info = label_info,
+                        label_type = label_type, label_pos = annotation_type,
+                        label_size = label_size, r0 = r0, r1 = r1, donut.label = FALSE)
+  }
+  leo_log("Ring/Pie plotted successfully.", level="success")
+  return(p)
+}
+
+#' Plot numeric values by group with jitter / beeswarm, color / shape / size mapping
+#'
+#' Draw a grouped scatter of numeric values with optional jitter /
+#' beeswarm arrangement, color / shape / size encoding, plus optional mean indicator.
 #'
 #' @param df           data.frame.
 #' @param group        column name (chr) mapped to x-axis categories.
@@ -62,8 +127,6 @@ plot_group_numbers <- function(df, group, number,
                                mean_type  = c("none","point","line"),
                                legend     = TRUE) {
   jitter <- match.arg(jitter); x_axis_pos <- match.arg(x_axis_pos); mean_type <- match.arg(mean_type)
-
-  # ------- sanity checks -------
   for (col in c(group, number)) if (!col %in% names(df)) cli_abort("Column '{col}' not found in df.")
   if (!is.null(color_col) && !color_col %in% names(df)) cli_abort("Color column '{color_col}' not found.")
   if (!is.null(shape_col) && !shape_col %in% names(df)) cli_abort("Shape column '{shape_col}' not found.")
@@ -72,8 +135,7 @@ plot_group_numbers <- function(df, group, number,
   n <- nrow(df)
   fill_col <- add_aes(ifelse(df[[shape_col]] %in% 21:25, df[[color_col]], NA), "fill")
 
-
-  # ------ colour ------
+  # ------ colour
   if (is.null(color_col)) {
     if (!is.null(color_rule)) {
       cols <- color_rule(df)
@@ -88,17 +150,17 @@ plot_group_numbers <- function(df, group, number,
     }
     color_col <- add_aes(cols, "col")
   }
-  # ------ shape -------
+  # ------ shape
   if (is.null(shape_col)) {
     shapes <- if (!is.null(shape_rule)) shape_rule(df) else rep(16, nrow(df))
     shape_col <- add_aes(shapes, "shape")
   }
-  # ------ size --------
+  # ------ size
   if (is.null(size_col)) {
     sizes <- if (!is.null(size_rule)) size_rule(df) else rep(2, nrow(df))
     size_col <- add_aes(sizes, "size")
   }
-  # ------ beeswarm fallback ------
+  # ------ beeswarm fallback
   if (jitter == "bee" && !requireNamespace("ggbeeswarm", quietly = TRUE)) {
     leo_log("Package 'ggbeeswarm' not installed, fallback to jitter.", level = "warning"); jitter <- "yes"
   }
@@ -179,4 +241,36 @@ leo_discrete_color <- function(levels = NULL, n = NULL, base_panel = NULL) {
 
   cli::cli_alert_success("Palette ready: {n} colors")
   pal
+}
+
+
+#' Rasterize point-like layers in a ggplot object
+#'
+#' @param plot A ggplot object.
+#' @param dpi Integer DPI for rasterization (default 300).
+#' @param layers Character vector of layer types to rasterize, e.g. c("Point","Jitter","Line","Segment","EdgeSegment").
+#'
+#' @return ggplot object with target layers rasterized.
+#'
+#' @examples
+#' library(ggplot2); library(ggrastr)
+#' plot <- ggplot(diamonds, aes(carat, price, colour = cut)) + geom_point()
+#' rasterize_layers(plot, dpi = 100)
+#' @export
+rasterize_layers <- function(plot, dpi = 300, layers = c("Point", "Jitter", "Line", "Segment", "EdgeSegment")){
+  if (!inherits(plot, "ggplot")) stop("`plot` must be a ggplot object.")
+  # list layer geom classes in the plot
+  layer_geoms <- sapply(plot$layers, function(l) class(l$geom)[1])
+  leo_log("layers in plot -> {paste(layer_geoms, collapse = \", \")}; target -> {paste(layers, collapse = \", \")}; dpi={dpi}")
+
+  # map human-friendly types to common Geom classes for presence check
+  type2geom <- c(Point = "GeomPoint", Jitter = "GeomJitter", Line = "GeomLine",
+                 Segment = "GeomSegment", EdgeSegment = "GeomEdgeSegment", EdgeLink = "GeomEdgeLink", Path = "GeomPath")
+
+  # rasterize only when requested type is present (or unknown -> try anyway)
+  for (t in layers) {
+    present <- if (t %in% names(type2geom)) type2geom[[t]] %in% layer_geoms else TRUE
+    if (present) { plot <- ggrastr::rasterize(plot, layers = t, dpi = dpi); leo_log("rasterized {t} layer(s).") }
+  }
+  return(plot)
 }
