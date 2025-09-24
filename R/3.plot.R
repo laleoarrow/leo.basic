@@ -1,3 +1,4 @@
+# plot function ----
 #' Plot pie/ring via ggpie with install hint
 #'
 #' @param x Numeric vector: values (type='num') or ratios (type='ratio').
@@ -6,7 +7,10 @@
 #' @param ring_ratio Visible ring thickness in [0,1]; 1=full pie (no hole).
 #' @param annotation_type "in" or "out" for label position.
 #' @param label_type "horizon" or "circle" for label style.
+#' @param color_alpha Alpha for colors in [0,1].
+#' @param border Logical; draw slice borders or not (default TRUE).
 #' @param label_size Label size.
+#'
 #' @return ggplot object.
 #'
 #' @importFrom ggpie ggpie ggdonut
@@ -16,11 +20,11 @@
 #' plot_pie(c(A=30,B=20,C=50), type="num", ring_ratio=1, annotation_type="in")
 #' plot_pie(c(A=0.2,B=0.3,C=0.5), type="ratio", ring_ratio=0.6, annotation_type="out", label_type="horizon",
 #'          colors=c("#66c2a5","#fc8d62","#8da0cb"))
-#' plot_pie(c(A=30,B=20,C=50), color_alpha = 0.8, type="num", ring_ratio=0.6, annotation_type="out")
+#' plot_pie(c(A=30,B=20,C=50), ring_ratio=.6, border=F, color_alpha = 0.8, type="num", label_type = "horizon", annotation_type="out")
 #' @export
-plot_pie <- function(x, colors=NULL, color_alpha = 1, type=c("num","ratio"), ring_ratio=1,
+plot_pie <- function(x, colors=NULL, color_alpha = 1, type=c("num","ratio"), ring_ratio=1, border=TRUE,
                      annotation_type=c("in","out"), label_type=c("horizon","circle"), label_size=4) {
-  leo_log("Tutorial: https://showteeth.github.io/ggpie/")
+  leo_log("Tutorial: https://showteeth.github.io/ggpie/articles/ggpie_manual.html")
   # --- package check (print install snippet if missing) ---
   if (!requireNamespace("ggpie", quietly = TRUE)) {
     cat("# install.packages('remotes')  # if not installed\n",
@@ -51,12 +55,16 @@ plot_pie <- function(x, colors=NULL, color_alpha = 1, type=c("num","ratio"), rin
     p <- ggpie::ggpie(data = df, group_key = "group", count_type = "count",
                       fill_color = colors, label_info = label_info,
                       label_type = label_type, label_pos = annotation_type,
-                      label_size = label_size)
+                      label_size = label_size,
+                      border_color = if (isTRUE(border)) "black" else NA,
+                      border_size  = if (isTRUE(border)) 1 else 0)
   } else {
     p <- ggpie::ggdonut(data = df, group_key = "group", count_type = "count",
                         fill_color = colors, label_info = label_info,
                         label_type = label_type, label_pos = annotation_type,
-                        label_size = label_size, r0 = r0, r1 = r1, donut.label = FALSE)
+                        label_size = label_size, r0 = r0, r1 = r1, donut.label = FALSE,
+                        border_color = if (isTRUE(border)) "black" else NA,
+                        border_size  = if (isTRUE(border)) 1 else 0)
   }
   leo_log("Ring/Pie plotted successfully.", level="success")
   return(p)
@@ -193,7 +201,7 @@ plot_group_numbers <- function(df, group, number,
   leo_log("Plotting complete.", level = "success"); return(p)
 }
 
-
+# misc function ----
 #' Generate a discrete color palette (expanded from a base panel)
 #'
 #' @description Return \code{n} distinct colors or a named vector for \code{levels}. Uses a fixed base panel and expands smoothly if more colors are needed.
@@ -273,4 +281,46 @@ rasterize_layers <- function(plot, dpi = 300, layers = c("Point", "Jitter", "Lin
     if (present) { plot <- ggrastr::rasterize(plot, layers = t, dpi = dpi); leo_log("rasterized {t} layer(s).") }
   }
   return(plot)
+}
+
+#' Put legend inside ggplot at (0.8, 0.8) npc
+#'
+#' Quickly move legend into the plotting area at user-defined (x, y) npc coordinates.
+#' Works for a single ggplot object or a list of ggplot objects.
+#'
+#' @param p A ggplot object or a list of ggplot objects
+#' @param x X position inside (npc, 0–1), default 0.8
+#' @param y Y position inside (npc, 0–1), default 0.8
+#'
+#' @return A ggplot object or list of ggplot objects with legend repositioned
+#'
+#' @importFrom ggplot2 theme element_rect
+#' @importFrom scales alpha
+#' @importFrom leo.basic leo_log
+#'
+#' @examples
+#' library(ggplot2)
+#' p <- ggplot(mtcars, aes(mpg, wt, colour = factor(cyl))) + geom_point()
+#' put_legend_inside(p)
+#' plist <- list(p, p)
+#' put_legend_inside(plist)
+#' @export
+put_legend_inside <- function(p, x = 0.8, y = 0.8) {
+  mod_fun <- function(plot) {
+    plot + ggplot2::theme(
+      legend.position = c(x, y),
+      legend.background = ggplot2::element_rect(fill = scales::alpha("white", 0.6), colour = NA),
+      legend.key = ggplot2::element_rect(fill = NA)
+    )
+  }
+
+  if (inherits(p, "ggplot")) {
+    leo_log(glue::glue("Legend moved inside to ({x}, {y}) for a ggplot object."))
+    return(mod_fun(p))
+  } else if (is.list(p) && all(vapply(p, inherits, logical(1), "ggplot"))) {
+    leo_log(glue::glue("Legend moved inside to ({x}, {y}) for a list of {length(p)} ggplots."))
+    return(lapply(p, mod_fun))
+  } else {
+    stop("Input must be a ggplot object or a list of ggplot objects")
+  }
 }

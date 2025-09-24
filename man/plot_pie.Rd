@@ -10,6 +10,7 @@ plot_pie(
   color_alpha = 1,
   type = c("num", "ratio"),
   ring_ratio = 1,
+  border = TRUE,
   annotation_type = c("in", "out"),
   label_type = c("horizon", "circle"),
   label_size = 4
@@ -20,9 +21,13 @@ plot_pie(
 
 \item{colors}{Vector of fill colors; NULL uses package palette.}
 
+\item{color_alpha}{Alpha for colors in \link{0,1}.}
+
 \item{type}{"num" or "ratio" for the meaning of x.}
 
 \item{ring_ratio}{Visible ring thickness in \link{0,1}; 1=full pie (no hole).}
+
+\item{border}{Logical; draw slice borders or not (default TRUE).}
 
 \item{annotation_type}{"in" or "out" for label position.}
 
@@ -40,5 +45,5 @@ Plot pie/ring via ggpie with install hint
 plot_pie(c(A=30,B=20,C=50), type="num", ring_ratio=1, annotation_type="in")
 plot_pie(c(A=0.2,B=0.3,C=0.5), type="ratio", ring_ratio=0.6, annotation_type="out", label_type="horizon",
          colors=c("#66c2a5","#fc8d62","#8da0cb"))
-plot_pie(c(A=30,B=20,C=50), color_alpha = 0.8, type="num", ring_ratio=0.6, annotation_type="out")
+plot_pie(c(A=30,B=20,C=50), ring_ratio=.6, border=F, color_alpha = 0.8, type="num", label_type = "horizon", annotation_type="out")
 }
