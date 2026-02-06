@@ -2,7 +2,7 @@
 % Please edit documentation in R/0.misc.R
 \name{install_deps}
 \alias{install_deps}
-\title{Install LEO package dependencies with pak}
+\title{Install LEO package dependencies}
 \usage{
 install_deps(leo.pak = "leo.basic", ncpus = 4L, upgrade = FALSE)
 }
@@ -17,6 +17,24 @@ install_deps(leo.pak = "leo.basic", ncpus = 4L, upgrade = FALSE)
 Invisibly returns the package specs passed to \code{pak::pkg_install()}.
 }
 \description{
-Install optional dependency sets for \code{leo.basic} or install known
-remote dependencies for other \code{leo.*} packages.
+Install dependency sets for \code{leo.basic} or other \code{leo.*} packages
+universe using \code{pak}.
+}
+\examples{
+\dontrun{
+# 1) Install pak
+install.packages("pak", repos = "https://cloud.r-project.org")
+
+# 2) Install leo.basic first
+pak::pkg_install("laleoarrow/leo.basic")
+
+# 3) Install leo.ukb (deps first, then package)
+leo.basic::install_deps("leo.ukb", ncpus = 8)
+pak::pkg_install("laleoarrow/leo.ukb")
+
+# 4) Install leo.gwas (deps first, then package)
+leo.basic::install_deps("leo.gwas", ncpus = 8)
+pak::pkg_install("laleoarrow/leo.gwas")
+}
+
 }

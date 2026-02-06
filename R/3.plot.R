@@ -213,7 +213,7 @@ plot_group_numbers <- function(df, group, number,
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_segment geom_point position_dodge scale_x_discrete scale_y_continuous
 #' @importFrom ggplot2 scale_color_manual scale_fill_manual labs theme expansion waiver
-#' @importFrom ggprism theme_prism
+#' @importFrom ggprism theme_prism guide_prism_bracket
 #' @importFrom scales label_percent
 #'
 #' @examples
@@ -277,7 +277,7 @@ plot_prism_lollipop <- function(df, x_var, y_var, group_var = NULL, color_palett
 
   leo_log("plot_prism_lollipop(): n={nrow(df_plot)}, grouped={grouped}, y_as_percent={y_as_percent}")
   p <- p +
-    ggplot2::scale_x_discrete() +
+    ggplot2::scale_x_discrete(guide = ggprism::guide_prism_bracket()) +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(c(0, 0.05)),
                                 labels = if (y_as_percent) scales::label_percent(scale = 1) else ggplot2::waiver()) +
     ggplot2::labs(x = NULL, y = y_label, title = plot_title, colour = NULL, fill = NULL) +

@@ -1,3 +1,37 @@
+#' Set or unset proxy
+#'
+#' Quickly enable or disable HTTP/HTTPS (and optionally SOCKS5) proxy for the current R session.
+#'
+#' @param enable TRUE to enable, FALSE to disable.
+#' @param host Proxy host address.
+#' @param port Proxy port number.
+#' @param socks Whether to also set SOCKS5 proxy.
+#'
+#' @export
+#' @examples
+#' # Enable proxy (HTTP/HTTPS + SOCKS5)
+#' set_proxy(TRUE, host = "127.0.0.1", port = 7897, socks = TRUE)
+#'
+#' # Test proxy
+#' system("curl cip.cc")
+#'
+#' # Disable proxy
+#' set_proxy(FALSE)
+set_proxy <- function(enable = TRUE, host = "127.0.0.1", port = 7897, socks = TRUE) {
+  if (enable) {
+    Sys.setenv(
+      http_proxy  = glue::glue("http://{host}:{port}"),
+      https_proxy = glue::glue("http://{host}:{port}")
+    )
+    if (socks) Sys.setenv(all_proxy = glue::glue("socks5://{host}:{port}"))
+    leo_log("✅ Proxy enabled: {host}:{port} {if (socks) '(HTTP/HTTPS + SOCKS5)' else '(HTTP/HTTPS only)'}")
+  } else {
+    Sys.unsetenv(c("http_proxy", "https_proxy", "all_proxy"))
+    leo_log("🚫 Proxy disabled.")
+  }
+  invisible()
+}
+
 #' Install local package
 #'
 #' This function is writen as I often forget what to code when I want to install a package from local source.
@@ -23,16 +57,34 @@ install_local <- function(path) {
   return(invisible())
 }
 
-#' Install LEO package dependencies with pak
+#' Install LEO package dependencies
 #'
-#' Install optional dependency sets for \code{leo.basic} or install known
-#' remote dependencies for other \code{leo.*} packages.
+#' Install dependency sets for \code{leo.basic} or other \code{leo.*} packages
+#' universe using \code{pak}.
 #'
 #' @param leo.pak Character scalar. LEO package name. Default \code{"leo.basic"}.
 #' @param ncpus Integer. Number of CPU cores for parallel compilation. Default 4.
 #' @param upgrade Logical. Whether to upgrade already installed packages. Default FALSE.
 #'
 #' @return Invisibly returns the package specs passed to \code{pak::pkg_install()}.
+#'
+#' @examples
+#' \dontrun{
+#' # 1) Install pak
+#' install.packages("pak", repos = "https://cloud.r-project.org")
+#'
+#' # 2) Install leo.basic first
+#' pak::pkg_install("laleoarrow/leo.basic")
+#'
+#' # 3) Install leo.ukb (deps first, then package)
+#' leo.basic::install_deps("leo.ukb", ncpus = 8)
+#' pak::pkg_install("laleoarrow/leo.ukb")
+#'
+#' # 4) Install leo.gwas (deps first, then package)
+#' leo.basic::install_deps("leo.gwas", ncpus = 8)
+#' pak::pkg_install("laleoarrow/leo.gwas")
+#' }
+#'
 #' @export
 install_deps <- function(leo.pak = "leo.basic", ncpus = 4L, upgrade = FALSE) {
   if (!requireNamespace("pak", quietly = TRUE)) {
@@ -80,38 +132,4 @@ install_deps <- function(leo.pak = "leo.basic", ncpus = 4L, upgrade = FALSE) {
   leo_log("Installing {length(specs)} dependencies for {leo.pak}", level = "info")
   pak::pkg_install(specs, upgrade = upgrade, ask = FALSE)
   invisible(specs)
-}
-
-#' Set or unset proxy
-#'
-#' Quickly enable or disable HTTP/HTTPS (and optionally SOCKS5) proxy for the current R session.
-#'
-#' @param enable TRUE to enable, FALSE to disable.
-#' @param host Proxy host address.
-#' @param port Proxy port number.
-#' @param socks Whether to also set SOCKS5 proxy.
-#'
-#' @export
-#' @examples
-#' # Enable proxy (HTTP/HTTPS + SOCKS5)
-#' set_proxy(TRUE, host = "127.0.0.1", port = 7897, socks = TRUE)
-#'
-#' # Test proxy
-#' system("curl cip.cc")
-#'
-#' # Disable proxy
-#' set_proxy(FALSE)
-set_proxy <- function(enable = TRUE, host = "127.0.0.1", port = 7897, socks = TRUE) {
-  if (enable) {
-    Sys.setenv(
-      http_proxy  = glue::glue("http://{host}:{port}"),
-      https_proxy = glue::glue("http://{host}:{port}")
-    )
-    if (socks) Sys.setenv(all_proxy = glue::glue("socks5://{host}:{port}"))
-    leo_log("✅ Proxy enabled: {host}:{port} {if (socks) '(HTTP/HTTPS + SOCKS5)' else '(HTTP/HTTPS only)'}")
-  } else {
-    Sys.unsetenv(c("http_proxy", "https_proxy", "all_proxy"))
-    leo_log("🚫 Proxy disabled.")
-  }
-  invisible()
 }
