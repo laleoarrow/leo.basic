@@ -11,6 +11,6 @@ install_local(path)
 }
 \description{
 This function is writen as I often forget what to code when I want to install a package from local source.
-It is in fact quite simple to add "repos = NULL, type = "source" in \code{install.packages()}.
+This now uses \code{pak::pkg_install()} for a consistent installation backend.
 Anyway, it is always good to simplify the process.
 }

@@ -65,8 +65,6 @@ format_gene_str2vec <- function(x, sep = "/", unique_only = TRUE) {
 #' @export
 #' @importFrom tibble tibble
 #' @importFrom dplyr inner_join group_by slice_max ungroup arrange desc
-#' @importFrom clusterProfiler bitr
-#' @importFrom org.Hs.eg.db org.Hs.eg.db
 prep_GSEA_geneList <- function(geneList_sym) {
   stopifnot(is.numeric(geneList_sym), !is.null(names(geneList_sym)))
   map <- clusterProfiler::bitr(names(geneList_sym), fromType = "SYMBOL", toType = "ENTREZID",
@@ -101,11 +99,9 @@ NULL
 #' @param simplify Use clusterProfiler::simplify for GO terms
 #' @return enrichResult
 #' @export
-#' @importFrom clusterProfiler enrichGO simplify
-#' @importFrom org.Hs.eg.db org.Hs.eg.db
 ORA_GO <- function(gene, simplify = T) {
   ego <- clusterProfiler::enrichGO(gene = gene,
-                                   OrgDb = org.Hs.eg.db,
+                                   OrgDb = org.Hs.eg.db::org.Hs.eg.db,
                                    keyType = 'SYMBOL',
                                    ont = "ALL",
                                    pAdjustMethod = "BH",
@@ -120,11 +116,9 @@ ORA_GO <- function(gene, simplify = T) {
 #' @param simplify Use clusterProfiler::simplify for GO terms
 #' @return gseaResult
 #' @export
-#' @importFrom clusterProfiler gseGO simplify
-#' @importFrom org.Hs.eg.db org.Hs.eg.db
 GSEA_GO <- function(geneList, simplify = T) {
   ego <- clusterProfiler::gseGO(geneList = geneList,
-                                OrgDb = org.Hs.eg.db,
+                                OrgDb = org.Hs.eg.db::org.Hs.eg.db,
                                 keyType = 'SYMBOL',
                                 ont = "ALL",
                                 pAdjustMethod = "BH",
@@ -143,8 +137,6 @@ GSEA_GO <- function(geneList, simplify = T) {
 #' @param organism KEGG organism code, default "hsa"
 #' @return enrichResult
 #' @export
-#' @importFrom clusterProfiler enrichKEGG bitr
-#' @importFrom org.Hs.eg.db org.Hs.eg.db
 #' @details
 #' '''{R}
 #' # KEGG_vis_notes: https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-kegg.html
@@ -164,7 +156,7 @@ GSEA_GO <- function(geneList, simplify = T) {
 #' '''
 ORA_KEGG <- function(gene, input = "SYMBOL") {
   if (input == "SYMBOL") {
-    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)$ENTREZID
+    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db::org.Hs.eg.db)$ENTREZID
     gene <- unique(gene)
   }
   kk <- clusterProfiler::enrichKEGG(gene = gene,
@@ -178,14 +170,15 @@ ORA_KEGG <- function(gene, input = "SYMBOL") {
 #' @param input "SYMBOL" or "ENTREZID"
 #' @return gseaResult
 #' @export
-#' @importFrom clusterProfiler gseKEGG
 GSEA_KEGG <- function(geneList, input = "SYMBOL"){
   if (input == "SYMBOL") geneList <- prep_GSEA_geneList(geneList)
-  kk <- gseKEGG(geneList = geneList,
-                organism = 'hsa',
-                minGSSize = 10,
-                pvalueCutoff = 0.05,
-                verbose = FALSE)
+  kk <- clusterProfiler::gseKEGG(
+    geneList = geneList,
+    organism = 'hsa',
+    minGSSize = 10,
+    pvalueCutoff = 0.05,
+    verbose = FALSE
+  )
   return(kk)
 }
 
@@ -195,11 +188,9 @@ GSEA_KEGG <- function(geneList, input = "SYMBOL"){
 #' @param input "SYMBOL" or "ENTREZID"
 #' @return enrichResult
 #' @export
-#' @importFrom clusterProfiler enrichMKEGG bitr
-#' @importFrom org.Hs.eg.db org.Hs.eg.db
 ORA_MKEGG <- function(gene, input = "SYMBOL") {
   if (input == "SYMBOL") {
-    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)$ENTREZID
+    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db::org.Hs.eg.db)$ENTREZID
     gene <- unique(gene)
   }
   mkk <- clusterProfiler::enrichMKEGG(gene = gene,
@@ -213,7 +204,6 @@ ORA_MKEGG <- function(gene, input = "SYMBOL") {
 #' @param input "SYMBOL" or "ENTREZID"
 #' @return gseaResult
 #' @export
-#' @importFrom clusterProfiler gseMKEGG
 GSEA_MKEGG <- function(geneList, input = "SYMBOL") {
   if (input == "SYMBOL") geneList <- prep_GSEA_geneList(geneList)
   mkk <- clusterProfiler::gseMKEGG(geneList = geneList,
@@ -229,13 +219,9 @@ GSEA_MKEGG <- function(geneList, input = "SYMBOL") {
 #' @param input "SYMBOL" or "ENTREZID"
 #' @return enrichResult
 #' @export
-#' @importFrom ReactomePA enrichPathway
-#' @importFrom clusterProfiler bitr
-#' @importFrom org.Hs.eg.db org.Hs.eg.db
 ORA_Reactome <- function(gene, input = "SYMBOL") {
-  require(ReactomePA)
   if (input == "SYMBOL") {
-    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)$ENTREZID
+    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db::org.Hs.eg.db)$ENTREZID
     gene <- unique(gene)
   }
   reactome <- ReactomePA::enrichPathway(gene = gene,
@@ -249,9 +235,7 @@ ORA_Reactome <- function(gene, input = "SYMBOL") {
 #' @param input "SYMBOL" or "ENTREZID"
 #' @return gseaResult
 #' @export
-#' @importFrom ReactomePA gsePathway
 GSEA_Reactome <- function(geneList, input = "SYMBOL") {
-  require(ReactomePA)
   if (input == "SYMBOL") geneList <- prep_GSEA_geneList(geneList)
   reactome <- ReactomePA::gsePathway(geneList = geneList,
                                      pvalueCutoff = 0.05,
@@ -287,13 +271,9 @@ GSEA_Reactome <- function(geneList, input = "SYMBOL") {
 #' geneList <- setNames(gene.df$logFC, gene.df$SYMBOL)  # for GSEA
 #' }
 #' @export
-#' @importFrom clusterProfiler enrichGO gseGO enrichKEGG gseKEGG enrichMKEGG gseMKEGG bitr simplify
-#' @importFrom ReactomePA enrichPathway gsePathway
-#' @importFrom org.Hs.eg.db org.Hs.eg.db
 leo_enrich <- function(gene, geneList, simplify =T, input = "SYMBOL",
                        method = c("ORA", "GSEA"),
                        background = c("GO", "KEGG", "MKEGG", "Reactome")) {
-  require(org.Hs.eg.db); require(clusterProfiler)
   # match arguments
   method <- match.arg(method, several.ok = TRUE)
   background <- match.arg(background, several.ok = TRUE)

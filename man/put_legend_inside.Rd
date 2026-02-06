@@ -2,28 +2,18 @@
 % Please edit documentation in R/3.plot.R
 \name{put_legend_inside}
 \alias{put_legend_inside}
-\title{Put legend inside ggplot at (0.8, 0.8) npc}
+\title{Put legend inside ggplot/patchwork at (0.8, 0.8) npc}
 \usage{
 put_legend_inside(p, x = 0.8, y = 0.8)
 }
 \arguments{
-\item{p}{A ggplot object or a list of ggplot objects}
+\item{p}{ggplot object, list of ggplot objects, or patchwork}
 
-\item{x}{X position inside (npc, 0–1), default 0.8}
-
-\item{y}{Y position inside (npc, 0–1), default 0.8}
+\item{x, y}{npc coordinates in \link{0,1}, default 0.8, 0.8}
 }
 \value{
-A ggplot object or list of ggplot objects with legend repositioned
+Same type as input with legend repositioned
 }
 \description{
-Quickly move legend into the plotting area at user-defined (x, y) npc coordinates.
-Works for a single ggplot object or a list of ggplot objects.
-}
-\examples{
-library(ggplot2)
-p <- ggplot(mtcars, aes(mpg, wt, colour = factor(cyl))) + geom_point()
-put_legend_inside(p)
-plist <- list(p, p)
-put_legend_inside(plist)
+Works for a single ggplot, a list of ggplots, or a patchwork object.
 }

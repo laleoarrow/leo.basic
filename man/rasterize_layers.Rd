@@ -7,7 +7,7 @@
 rasterize_layers(
   plot,
   dpi = 300,
-  layers = c("Point", "Jitter", "Line", "Segment", "EdgeSegment")
+  layers = c("Point", "Jitter", "Line", "Segment", "Linerange", "EdgeSegment")
 )
 }
 \arguments{

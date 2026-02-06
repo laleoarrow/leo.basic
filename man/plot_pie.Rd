@@ -12,7 +12,7 @@ plot_pie(
   ring_ratio = 1,
   border = TRUE,
   annotation_type = c("in", "out"),
-  label_type = c("horizon", "circle"),
+  label_type = c("horizon", "circle", "none"),
   label_size = 4
 )
 }
@@ -31,7 +31,7 @@ plot_pie(
 
 \item{annotation_type}{"in" or "out" for label position.}
 
-\item{label_type}{"horizon" or "circle" for label style.}
+\item{label_type}{"horizon" or "circle" for label style. Or "none" for no labels.}
 
 \item{label_size}{Label size.}
 }

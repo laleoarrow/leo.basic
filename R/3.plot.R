@@ -6,14 +6,13 @@
 #' @param type "num" or "ratio" for the meaning of x.
 #' @param ring_ratio Visible ring thickness in [0,1]; 1=full pie (no hole).
 #' @param annotation_type "in" or "out" for label position.
-#' @param label_type "horizon" or "circle" for label style.
+#' @param label_type "horizon" or "circle" for label style. Or "none" for no labels.
 #' @param color_alpha Alpha for colors in [0,1].
 #' @param border Logical; draw slice borders or not (default TRUE).
 #' @param label_size Label size.
 #'
 #' @return ggplot object.
 #'
-#' @importFrom ggpie ggpie ggdonut
 #' @importFrom ggsci pal_npg
 #' @importFrom grDevices adjustcolor
 #' @examples
@@ -23,16 +22,8 @@
 #' plot_pie(c(A=30,B=20,C=50), ring_ratio=.6, border=F, color_alpha = 0.8, type="num", label_type = "horizon", annotation_type="out")
 #' @export
 plot_pie <- function(x, colors=NULL, color_alpha = 1, type=c("num","ratio"), ring_ratio=1, border=TRUE,
-                     annotation_type=c("in","out"), label_type=c("horizon","circle"), label_size=4) {
+                     annotation_type=c("in","out"), label_type=c("horizon","circle","none"), label_size=4) {
   leo_log("Tutorial: https://showteeth.github.io/ggpie/articles/ggpie_manual.html")
-  # --- package check (print install snippet if missing) ---
-  if (!requireNamespace("ggpie", quietly = TRUE)) {
-    cat("# install.packages('remotes')  # if not installed\n",
-        "install.packages('ggpie')\n",
-        "# or\n",
-        "remotes::install_github('showteeth/ggpie')\n", sep = "")
-    return(leo_log("Package 'ggpie' not found", level="danger"))
-  }
   if (is.null(colors)) colors <- ggsci::pal_npg("nrc")(length(x))
   if (color_alpha < 1) colors <- grDevices::adjustcolor(colors, alpha.f = color_alpha)
   # --- validate input ---
@@ -201,7 +192,102 @@ plot_group_numbers <- function(df, group, number,
   leo_log("Plotting complete.", level = "success"); return(p)
 }
 
+#' Prism-style lollipop plot (grouped or single series)
+#'
+#' @description
+#' Create a lollipop plot with Prism-style x-axis brackets, suitable for grouped or single-series data.
+#'
+#' @param df Data frame containing the data.
+#' @param x_var Bare column name for the x-axis (categorical variable).
+#' @param y_var Bare column name for the y-axis (numeric variable).
+#' @param group_var Optional bare column name for grouping; if NULL, a single series is plotted.
+#' @param color_palette Named vector of colors for each group; for single-series, first color is used.
+#' @param y_label Label for the y-axis.
+#' @param y_as_percent Logical; if TRUE, scales y_var by 100 and formats labels as percentages.
+#' @param plot_title Optional plot title.
+#' @param segment_width Numeric; line width of the lollipop segments. Default is 1.
+#' @param point_size Numeric; size of the lollipop points. Default is 4.
+#' @param point_stroke Numeric; stroke width of point borders. Default is 1.
+#'
+#' @return A `ggplot2` object.
+#' @export
+#' @importFrom ggplot2 ggplot aes geom_segment geom_point position_dodge scale_x_discrete scale_y_continuous
+#' @importFrom ggplot2 scale_color_manual scale_fill_manual labs theme expansion waiver
+#' @importFrom ggprism theme_prism
+#' @importFrom scales label_percent
+#'
+#' @examples
+#' # Single-series example
+#' df_single <- data.frame(Stage = LETTERS[1:5], Rate = c(0.12, 0.14, 0.2, 0.17, 0.22))
+#' plot_prism_lollipop(df_single, Stage, Rate, color_palette = c("#0072B2"), y_label = "Conversion Rate (%)",
+#'                     y_as_percent = TRUE, plot_title = "Single Series Lollipop Plot")
+#'
+#' # Grouped example
+#' df_grouped <- data.frame(Category = rep(LETTERS[1:5], 2), Score = runif(10, 0.3, 0.6),
+#'                          Group = rep(c("G1", "G2"), each = 5))
+#' pal <- c("G1" = "#E69F00", "G2" = "#56B4E9")
+#' plot_prism_lollipop(df_grouped, Category, Score, Group, color_palette = pal, y_label = "Score (%)",
+#'                     y_as_percent = TRUE, plot_title = "Grouped Lollipop Plot")
+plot_prism_lollipop <- function(df, x_var, y_var, group_var = NULL, color_palette = NULL, y_label = "Value",
+                                y_as_percent = F, plot_title = NULL, segment_width = 1, point_size = 4,
+                                point_stroke = 1) {
+  x_quo <- rlang::enquo(x_var); y_quo <- rlang::enquo(y_var); group_quo <- rlang::enquo(group_var)
+  x_name <- rlang::as_name(x_quo); y_name <- rlang::as_name(y_quo)
+  grouped <- !rlang::quo_is_null(group_quo)
+  if (!x_name %in% names(df)) stop("`x_var` not found in `df`.")
+  if (!y_name %in% names(df)) stop("`y_var` not found in `df`.")
+  if (!is.numeric(df[[y_name]])) stop("`y_var` must be numeric.")
+  df_plot <- data.frame(x_value = as.character(df[[x_name]]), y_value = as.numeric(df[[y_name]]),
+                        stringsAsFactors = F) %>%
+    transform(y_value = if (y_as_percent) y_value * 100 else y_value,
+              x_value = factor(x_value, levels = unique(x_value)))
+  if (any(is.na(df_plot$x_value)) || any(is.na(df_plot$y_value))) stop("`x_var` and `y_var` cannot contain NA.")
+
+  if (grouped) {
+    group_name <- rlang::as_name(group_quo)
+    if (!group_name %in% names(df)) stop("`group_var` not found in `df`.")
+    df_plot$group_value <- as.character(df[[group_name]])
+    if (any(is.na(df_plot$group_value))) stop("`group_var` cannot contain NA.")
+    group_levels <- unique(df_plot$group_value)
+    if (is.null(color_palette)) color_palette <- leo_discrete_color(levels = group_levels)
+    if (is.null(names(color_palette)) || any(names(color_palette) == "")) {
+      if (length(color_palette) < length(group_levels)) stop("`color_palette` has fewer colors than groups.")
+      color_palette <- unname(color_palette)[seq_along(group_levels)]
+      names(color_palette) <- group_levels
+    }
+    if (!all(group_levels %in% names(color_palette))) stop("`color_palette` names must cover all groups.")
+    color_palette <- color_palette[group_levels]
+    df_plot$group_value <- factor(df_plot$group_value, levels = names(color_palette))
+    dodge_width <- 0.65
+
+    p <- ggplot2::ggplot(df_plot, ggplot2::aes(x = x_value, y = y_value, colour = group_value, fill = group_value, group = group_value)) +
+      ggplot2::geom_linerange(ggplot2::aes(ymin = 0, ymax = y_value), linewidth = segment_width,
+                              lineend = "round", position = ggplot2::position_dodge(width = dodge_width)) +
+      ggplot2::geom_point(shape = 21, size = point_size, stroke = point_stroke, colour = "white",
+                          position = ggplot2::position_dodge(width = dodge_width)) +
+      ggplot2::scale_color_manual(values = color_palette) +
+      ggplot2::scale_fill_manual(values = color_palette)
+  } else {
+    point_color <- if (is.null(color_palette)) leo_discrete_color(n = 1)[1] else unname(color_palette)[1]
+    p <- ggplot2::ggplot(df_plot, ggplot2::aes(x = x_value, y = y_value)) +
+      ggplot2::geom_segment(ggplot2::aes(xend = x_value, y = 0, yend = y_value), linewidth = segment_width,
+                            colour = point_color, lineend = "round") +
+      ggplot2::geom_point(shape = 21, size = point_size, stroke = point_stroke, colour = "white", fill = point_color)
+  }
+
+  leo_log("plot_prism_lollipop(): n={nrow(df_plot)}, grouped={grouped}, y_as_percent={y_as_percent}")
+  p <- p +
+    ggplot2::scale_x_discrete() +
+    ggplot2::scale_y_continuous(expand = ggplot2::expansion(c(0, 0.05)),
+                                labels = if (y_as_percent) scales::label_percent(scale = 1) else ggplot2::waiver()) +
+    ggplot2::labs(x = NULL, y = y_label, title = plot_title, colour = NULL, fill = NULL) +
+    ggprism::theme_prism(base_size = 14) +
+    ggplot2::theme(legend.position = if (grouped) "top" else "none")
+  return(p)
+}
+
 # misc function ----
+
 #' Generate a discrete color palette (expanded from a base panel)
 #'
 #' @description Return \code{n} distinct colors or a named vector for \code{levels}. Uses a fixed base panel and expands smoothly if more colors are needed.
@@ -251,7 +337,6 @@ leo_discrete_color <- function(levels = NULL, n = NULL, base_panel = NULL) {
   pal
 }
 
-
 #' Rasterize point-like layers in a ggplot object
 #'
 #' @param plot A ggplot object.
@@ -265,15 +350,18 @@ leo_discrete_color <- function(levels = NULL, n = NULL, base_panel = NULL) {
 #' plot <- ggplot(diamonds, aes(carat, price, colour = cut)) + geom_point()
 #' rasterize_layers(plot, dpi = 100)
 #' @export
-rasterize_layers <- function(plot, dpi = 300, layers = c("Point", "Jitter", "Line", "Segment", "EdgeSegment")){
+rasterize_layers <- function(plot, dpi = 300, layers = c("Point", "Jitter", "Line", "Segment", "Linerange", "EdgeSegment")){
   if (!inherits(plot, "ggplot")) stop("`plot` must be a ggplot object.")
   # list layer geom classes in the plot
   layer_geoms <- sapply(plot$layers, function(l) class(l$geom)[1])
   leo_log("layers in plot -> {paste(layer_geoms, collapse = \", \")}; target -> {paste(layers, collapse = \", \")}; dpi={dpi}")
 
   # map human-friendly types to common Geom classes for presence check
-  type2geom <- c(Point = "GeomPoint", Jitter = "GeomJitter", Line = "GeomLine",
-                 Segment = "GeomSegment", EdgeSegment = "GeomEdgeSegment", EdgeLink = "GeomEdgeLink", Path = "GeomPath")
+  type2geom <- c(
+    Point = "GeomPoint", Jitter = "GeomJitter", Line = "GeomLine",
+    Segment = "GeomSegment", Linerange = "GeomLinerange",
+    EdgeSegment = "GeomEdgeSegment", EdgeLink = "GeomEdgeLink", Path = "GeomPath", Rect = "GeomRect"
+  )
 
   # rasterize only when requested type is present (or unknown -> try anyway)
   for (t in layers) {
@@ -283,44 +371,48 @@ rasterize_layers <- function(plot, dpi = 300, layers = c("Point", "Jitter", "Lin
   return(plot)
 }
 
-#' Put legend inside ggplot at (0.8, 0.8) npc
+#' Put legend inside ggplot/patchwork at (0.8, 0.8) npc
 #'
-#' Quickly move legend into the plotting area at user-defined (x, y) npc coordinates.
-#' Works for a single ggplot object or a list of ggplot objects.
+#' Works for a single ggplot, a list of ggplots, or a patchwork object.
 #'
-#' @param p A ggplot object or a list of ggplot objects
-#' @param x X position inside (npc, 0–1), default 0.8
-#' @param y Y position inside (npc, 0–1), default 0.8
+#' @param p ggplot object, list of ggplot objects, or patchwork
+#' @param x,y npc coordinates in [0,1], default 0.8, 0.8
 #'
-#' @return A ggplot object or list of ggplot objects with legend repositioned
+#' @return Same type as input with legend repositioned
 #'
 #' @importFrom ggplot2 theme element_rect
 #' @importFrom scales alpha
-#' @importFrom leo.basic leo_log
-#'
-#' @examples
-#' library(ggplot2)
-#' p <- ggplot(mtcars, aes(mpg, wt, colour = factor(cyl))) + geom_point()
-#' put_legend_inside(p)
-#' plist <- list(p, p)
-#' put_legend_inside(plist)
+#' @importFrom glue glue
 #' @export
 put_legend_inside <- function(p, x = 0.8, y = 0.8) {
   mod_fun <- function(plot) {
     plot + ggplot2::theme(
-      legend.position = c(x, y),
+      legend.position   = c(x, y),
       legend.background = ggplot2::element_rect(fill = scales::alpha("white", 0.6), colour = NA),
-      legend.key = ggplot2::element_rect(fill = NA)
+      legend.key        = ggplot2::element_rect(fill = NA)
     )
   }
 
   if (inherits(p, "ggplot")) {
     leo_log(glue::glue("Legend moved inside to ({x}, {y}) for a ggplot object."))
     return(mod_fun(p))
+
   } else if (is.list(p) && all(vapply(p, inherits, logical(1), "ggplot"))) {
     leo_log(glue::glue("Legend moved inside to ({x}, {y}) for a list of {length(p)} ggplots."))
     return(lapply(p, mod_fun))
+
+  } else if (inherits(p, "patchwork")) {
+    leo_log(glue::glue("Legend moved inside to ({x}, {y}) for a patchwork object."))
+    return(
+      p & ggplot2::theme(
+        legend.position   = c(x, y),
+        legend.background = ggplot2::element_rect(fill = scales::alpha("white", 0.6), colour = NA),
+        legend.key        = ggplot2::element_rect(fill = NA)
+      )
+    )
+
   } else {
-    stop("Input must be a ggplot object or a list of ggplot objects")
+    leo_log("Input must be a ggplot object, a list of ggplot objects, or a patchwork object.", level = "danger")
+    return(invisible(NULL))
   }
 }

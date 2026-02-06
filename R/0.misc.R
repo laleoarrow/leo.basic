@@ -1,7 +1,7 @@
 #' Install local package
 #'
 #' This function is writen as I often forget what to code when I want to install a package from local source.
-#' It is in fact quite simple to add "repos = NULL, type = "source" in `install.packages()`.
+#' This now uses `pak::pkg_install()` for a consistent installation backend.
 #' Anyway, it is always good to simplify the process.
 #'
 #' @param path The path to the local package source.
@@ -12,9 +12,52 @@ install_local <- function(path) {
     leo_log("Wrong path to the package source. Please check the path and try again.", level = "danger")
     return(invisible())
   }
+  if (!requireNamespace("pak", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "Package {.pkg pak} is required by {.fn install_local}.",
+      "i" = "Install with {.code install.packages('pak')} first."
+    ))
+  }
   leo_log("Installing package from local source...")
-  install.packages(path, repos = NULL, type = "source")
+  pak::pkg_install(path)
   return(invisible())
+}
+
+#' Install LEO package dependencies with pak
+#'
+#' Install optional dependency sets for \code{leo.basic} or install known
+#' remote dependencies for other \code{leo.*} packages.
+#'
+#' @param leo.pak Character scalar. LEO package name. Default \code{"leo.basic"}.
+#'
+#' @return Invisibly returns the package specs passed to \code{pak::pkg_install()}.
+#' @export
+install_deps <- function(leo.pak = "leo.basic") {
+  if (!requireNamespace("pak", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "Package {.pkg pak} is required by {.fn install_deps}.",
+      "i" = "Install with {.code install.packages('pak')} first."
+    ))
+  }
+
+  leo.pak <- as.character(leo.pak)[1]
+
+  specs <- switch(
+    leo.pak,
+    "leo.basic" = c("showteeth/ggpie", "bioc::clusterProfiler", "bioc::ReactomePA", "bioc::org.Hs.eg.db"),
+    "leo.gwas" = c("laleoarrow/leo.basic", "stephenturner/annotables"),
+    "leo.ukb" = "laleoarrow/leo.basic",
+    sprintf("laleoarrow/%s", leo.pak)
+  )
+
+  if (!leo.pak %in% c("leo.basic", "leo.gwas", "leo.ukb")) {
+    leo_log("No preset dependency map for {leo.pak}; installing remote package with pak.", level = "warning")
+  }
+
+  specs <- unique(specs)
+  leo_log("Installing dependencies for {leo.pak} with pak: {paste(specs, collapse = ', ')}", level = "info")
+  pak::pkg_install(specs)
+  invisible(specs)
 }
 
 #' Set or unset proxy
