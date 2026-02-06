@@ -45,8 +45,21 @@ install_deps <- function(leo.pak = "leo.basic") {
   specs <- switch(
     leo.pak,
     "leo.basic" = c("showteeth/ggpie", "bioc::clusterProfiler", "bioc::ReactomePA", "bioc::org.Hs.eg.db"),
-    "leo.gwas" = c("laleoarrow/leo.basic", "stephenturner/annotables"),
-    "leo.ukb" = "laleoarrow/leo.basic",
+    "leo.gwas" = c(
+      "laleoarrow/leo.basic", "stephenturner/annotables",
+      "catboost/catboost/catboost/R-package",
+      "bioc::AnnotationDbi", "bioc::biomaRt", "bioc::BSgenome",
+      "bioc::GenomicFeatures", "bioc::MungeSumstats", "bioc::rtracklayer",
+      "caret", "cli", "data.table", "ggplot2", "ggsci", "glmnet", "glue",
+      "ieugwasr", "LDlinkR", "magrittr", "plinkbinr", "pROC", "purrr",
+      "RColorBrewer", "rlang", "stringr", "tidyr", "TwoSampleMR", "vroom"
+    ),
+    "leo.ukb" = c(
+      "laleoarrow/leo.basic",
+      "broom", "cli", "data.table", "dplyr", "flextable", "glue",
+      "lifecycle", "mice", "missRanger", "nortest", "rlang",
+      "stringr", "tableone", "tibble", "tidyr", "VIM", "xtable"
+    ),
     sprintf("laleoarrow/%s", leo.pak)
   )
 
