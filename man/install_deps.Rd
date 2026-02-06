@@ -4,10 +4,14 @@
 \alias{install_deps}
 \title{Install LEO package dependencies with pak}
 \usage{
-install_deps(leo.pak = "leo.basic")
+install_deps(leo.pak = "leo.basic", ncpus = 4L, upgrade = FALSE)
 }
 \arguments{
 \item{leo.pak}{Character scalar. LEO package name. Default \code{"leo.basic"}.}
+
+\item{ncpus}{Integer. Number of CPU cores for parallel compilation. Default 4.}
+
+\item{upgrade}{Logical. Whether to upgrade already installed packages. Default FALSE.}
 }
 \value{
 Invisibly returns the package specs passed to \code{pak::pkg_install()}.
