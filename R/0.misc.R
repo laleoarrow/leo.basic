@@ -29,15 +29,24 @@ install_local <- function(path) {
 #' remote dependencies for other \code{leo.*} packages.
 #'
 #' @param leo.pak Character scalar. LEO package name. Default \code{"leo.basic"}.
+#' @param ncpus Integer. Number of CPU cores for parallel compilation. Default 4.
+#' @param upgrade Logical. Whether to upgrade already installed packages. Default FALSE.
 #'
 #' @return Invisibly returns the package specs passed to \code{pak::pkg_install()}.
 #' @export
-install_deps <- function(leo.pak = "leo.basic") {
+install_deps <- function(leo.pak = "leo.basic", ncpus = 4L, upgrade = FALSE) {
   if (!requireNamespace("pak", quietly = TRUE)) {
     cli::cli_abort(c(
       "Package {.pkg pak} is required by {.fn install_deps}.",
       "i" = "Install with {.code install.packages('pak')} first."
     ))
+  }
+
+  # Set parallel compilation
+  ncpus <- as.integer(ncpus)
+  if (ncpus > 1L) {
+    Sys.setenv(MAKEFLAGS = sprintf("-j%d", ncpus))
+    leo_log("Using {ncpus} CPU cores for compilation", level = "info")
   }
 
   leo.pak <- as.character(leo.pak)[1]
@@ -68,8 +77,8 @@ install_deps <- function(leo.pak = "leo.basic") {
   }
 
   specs <- unique(specs)
-  leo_log("Installing dependencies for {leo.pak} with pak: {paste(specs, collapse = ', ')}", level = "info")
-  pak::pkg_install(specs)
+  leo_log("Installing {length(specs)} dependencies for {leo.pak}", level = "info")
+  pak::pkg_install(specs, upgrade = upgrade, ask = FALSE)
   invisible(specs)
 }
 
