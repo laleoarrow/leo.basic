@@ -132,7 +132,6 @@ plot_group_numbers <- function(df, group, number,
   if (!is.null(size_col)  && !size_col  %in% names(df)) cli_abort("Size column '{size_col}' not found.")
   add_aes <- function(vec, nm) { new <- paste0(".leo_", nm); df[[new]] <<- vec; new }
   n <- nrow(df)
-  fill_col <- add_aes(ifelse(df[[shape_col]] %in% 21:25, df[[color_col]], NA), "fill")
 
   # ------ colour
   if (is.null(color_col)) {
@@ -159,6 +158,8 @@ plot_group_numbers <- function(df, group, number,
     sizes <- if (!is.null(size_rule)) size_rule(df) else rep(2, nrow(df))
     size_col <- add_aes(sizes, "size")
   }
+  # ------ fill (for shapes 21-25 that support fill)
+  fill_col <- add_aes(ifelse(df[[shape_col]] %in% 21:25, df[[color_col]], NA), "fill")
   # ------ beeswarm fallback
   if (jitter == "bee" && !requireNamespace("ggbeeswarm", quietly = TRUE)) {
     leo_log("Package 'ggbeeswarm' not installed, fallback to jitter.", level = "warning"); jitter <- "yes"
