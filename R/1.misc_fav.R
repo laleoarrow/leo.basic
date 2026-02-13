@@ -201,3 +201,75 @@ leo_time_elapsed <- function(start_time, digits = 2, return = FALSE) {
   leo_log("Elapsed", out, level = "success")
   invisible(out)
 }
+
+#' View DataFrame with Visidata from Terminal
+#'
+#' Opens a dataframe in Visidata (`vd`) from the R console.
+#' Uses `data.table` or `vroom` for fast writing if available.
+#'
+#' @param df   Dataframe or matrix to view.
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#'   data(mtcars)
+#'   vd(mtcars)
+#'   # Pipe support
+#'   mtcars %>% vd()
+#' }
+vd <- function(df) {
+  if (missing(df)) {
+    cli::cli_alert_danger("Usage: vd(dataframe)")
+    return(invisible(NULL))
+  }
+
+  # 1. Check for 'vd' command
+  vd_cmd <- Sys.which("vd")
+  if (vd_cmd == "") {
+    # Fallback check for common user paths (especially for pip install --user)
+    common_paths <- c(
+      file.path(Sys.getenv("HOME"), ".local/bin/vd"),
+      "/opt/homebrew/bin/vd", "/usr/local/bin/vd"
+    )
+    for (p in common_paths) {
+      if (file.exists(p)) {
+        vd_cmd <- p
+        break
+      }
+    }
+  }
+
+  if (vd_cmd == "") {
+    hint <- switch(Sys.info()[["sysname"]],
+      Darwin  = "'brew/pip install visidata'",
+      Linux   = "'apt/yum/pip install visidata'",
+      Windows = "'choco/pip install visidata'",
+      "'pip install visidata'"
+    )
+    cli::cli_alert_warning(glue::glue("Visidata (vd) not found. Please install via {hint}"))
+    return(invisible(df))
+  }
+
+  # 2. Temp file creation
+  # Tips for Visidata usage
+  leo_log("Launching Visidata... [Tips: Shift+F:Freq/Filter, Shift+S:Sheets, -/+:Select, q:Back]", level = "info")
+  tmp_file <- tempfile(pattern = "vd_r_data_", fileext = ".csv")
+  
+  # 3. Fast Write: data.table > vroom > base
+  if (requireNamespace("data.table", quietly = TRUE)) {
+    data.table::fwrite(df, tmp_file, showProgress = FALSE)
+  } else if (requireNamespace("vroom", quietly = TRUE)) {
+    vroom::vroom_write(df, tmp_file, delim = ",", progress = FALSE)
+  } else {
+    utils::write.csv(df, tmp_file, row.names = FALSE)
+  }
+
+  # 4. Execute Visidata
+  system2(vd_cmd, args = c(tmp_file), wait = TRUE)
+
+  # 5. Cleanup
+  if (file.exists(tmp_file)) unlink(tmp_file)
+  leo_log("Visidata closed", level = "success")
+  
+  invisible(df)
+}

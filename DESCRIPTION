@@ -1,11 +1,9 @@
 Package: leo.basic
 Title: leo.basic
 Version: 0.0.1
-Authors@R: 
-    person("Ao", "Lu", , "luao@stu.cqmu.edu.cn", role = c("aut", "cre"))
+Authors@R: person("Ao", "Lu", email = "luao@stu.cqmu.edu.cn", role = c("aut", "cre"))
 Description: Basic function for leo universe.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -18,16 +16,20 @@ Imports:
     ggprism,
     ggsci,
     glue,
+    grDevices,
     magrittr,
     nortest,
     rlang,
     scales,
+    stats,
     tibble
 Suggests:
     clusterProfiler,
     ggpie,
+    ggrastr,
     org.Hs.eg.db,
     pak,
+    patchwork,
     ReactomePA
 Remotes:
     github::showteeth/ggpie,

@@ -42,6 +42,13 @@ plot_pie <- function(x, colors=NULL, color_alpha = 1, type=c("num","ratio"), rin
   ring_ratio <- max(0, min(1, ring_ratio)); r0 <- 1 - ring_ratio; r1 <- 1
   leo_log("Plot {ifelse(ring_ratio>=1,'pie','donut')}: n={nrow(df)}, type={type}, labels={label_info}, pos={annotation_type}, style={label_type}, ring_ratio={ring_ratio}")
 
+  if (!requireNamespace("ggpie", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "Package {.pkg ggpie} is required by {.fn plot_pie}.",
+      "i" = "Install with {.code pak::pkg_install('showteeth/ggpie')}."
+    ))
+  }
+
   if (ring_ratio >= 1) {
     p <- ggpie::ggpie(data = df, group_key = "group", count_type = "count",
                       fill_color = colors, label_info = label_info,
@@ -367,7 +374,14 @@ rasterize_layers <- function(plot, dpi = 300, layers = c("Point", "Jitter", "Lin
   # rasterize only when requested type is present (or unknown -> try anyway)
   for (t in layers) {
     present <- if (t %in% names(type2geom)) type2geom[[t]] %in% layer_geoms else TRUE
-    if (present) { plot <- ggrastr::rasterize(plot, layers = t, dpi = dpi); leo_log("rasterized {t} layer(s).") }
+    if (present) {
+      if (!requireNamespace("ggrastr", quietly = TRUE)) {
+        leo_log("Package 'ggrastr' not installed, skipping rasterization for {t}.", level = "warning")
+        next
+      }
+      plot <- ggrastr::rasterize(plot, layers = t, dpi = dpi)
+      leo_log("rasterized {t} layer(s).")
+    }
   }
   return(plot)
 }
