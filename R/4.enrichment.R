@@ -99,7 +99,7 @@ NULL
 #' @param simplify Use clusterProfiler::simplify for GO terms
 #' @return enrichResult
 #' @export
-ORA_GO <- function(gene, simplify = T) {
+ORA_GO <- function(gene, simplify = TRUE) {
   ego <- clusterProfiler::enrichGO(gene = gene,
                                    OrgDb = org.Hs.eg.db::org.Hs.eg.db,
                                    keyType = 'SYMBOL',
@@ -116,7 +116,7 @@ ORA_GO <- function(gene, simplify = T) {
 #' @param simplify Use clusterProfiler::simplify for GO terms
 #' @return gseaResult
 #' @export
-GSEA_GO <- function(geneList, simplify = T) {
+GSEA_GO <- function(geneList, simplify = TRUE) {
   ego <- clusterProfiler::gseGO(geneList = geneList,
                                 OrgDb = org.Hs.eg.db::org.Hs.eg.db,
                                 keyType = 'SYMBOL',
@@ -125,7 +125,7 @@ GSEA_GO <- function(geneList, simplify = T) {
                                 minGSSize = 100,
                                 maxGSSize = 500,
                                 pvalueCutoff = 0.05,
-                                verbose = T)
+                                verbose = TRUE)
   if (simplify) ego <- clusterProfiler::simplify(ego, cutoff = 0.7)
   return(ego)
 }
@@ -271,7 +271,7 @@ GSEA_Reactome <- function(geneList, input = "SYMBOL") {
 #' geneList <- setNames(gene.df$logFC, gene.df$SYMBOL)  # for GSEA
 #' }
 #' @export
-leo_enrich <- function(gene, geneList, simplify =T, input = "SYMBOL",
+leo_enrich <- function(gene, geneList, simplify = TRUE, input = "SYMBOL",
                        method = c("ORA", "GSEA"),
                        background = c("GO", "KEGG", "MKEGG", "Reactome")) {
   # match arguments

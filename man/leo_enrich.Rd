@@ -7,7 +7,7 @@
 leo_enrich(
   gene,
   geneList,
-  simplify = T,
+  simplify = TRUE,
   input = "SYMBOL",
   method = c("ORA", "GSEA"),
   background = c("GO", "KEGG", "MKEGG", "Reactome")

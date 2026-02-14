@@ -19,7 +19,7 @@
 #' plot_pie(c(A=30,B=20,C=50), type="num", ring_ratio=1, annotation_type="in")
 #' plot_pie(c(A=0.2,B=0.3,C=0.5), type="ratio", ring_ratio=0.6, annotation_type="out", label_type="horizon",
 #'          colors=c("#66c2a5","#fc8d62","#8da0cb"))
-#' plot_pie(c(A=30,B=20,C=50), ring_ratio=.6, border=F, color_alpha = 0.8, type="num", label_type = "horizon", annotation_type="out")
+#' plot_pie(c(A=30,B=20,C=50), ring_ratio=.6, border=FALSE, color_alpha = 0.8, type="num", label_type = "horizon", annotation_type="out")
 #' @export
 plot_pie <- function(x, colors=NULL, color_alpha = 1, type=c("num","ratio"), ring_ratio=1, border=TRUE,
                      annotation_type=c("in","out"), label_type=c("horizon","circle","none"), label_size=4) {
@@ -237,7 +237,7 @@ plot_group_numbers <- function(df, group, number,
 #' plot_prism_lollipop(df_grouped, Category, Score, Group, color_palette = pal, y_label = "Score (%)",
 #'                     y_as_percent = TRUE, plot_title = "Grouped Lollipop Plot")
 plot_prism_lollipop <- function(df, x_var, y_var, group_var = NULL, color_palette = NULL, y_label = "Value",
-                                y_as_percent = F, plot_title = NULL, segment_width = 1, point_size = 4,
+                                y_as_percent = FALSE, plot_title = NULL, segment_width = 1, point_size = 4,
                                 point_stroke = 1) {
   x_quo <- rlang::enquo(x_var); y_quo <- rlang::enquo(y_var); group_quo <- rlang::enquo(group_var)
   x_name <- rlang::as_name(x_quo); y_name <- rlang::as_name(y_quo)
@@ -246,7 +246,7 @@ plot_prism_lollipop <- function(df, x_var, y_var, group_var = NULL, color_palett
   if (!y_name %in% names(df)) stop("`y_var` not found in `df`.")
   if (!is.numeric(df[[y_name]])) stop("`y_var` must be numeric.")
   df_plot <- data.frame(x_value = as.character(df[[x_name]]), y_value = as.numeric(df[[y_name]]),
-                        stringsAsFactors = F) %>%
+                        stringsAsFactors = FALSE) %>%
     transform(y_value = if (y_as_percent) y_value * 100 else y_value,
               x_value = factor(x_value, levels = unique(x_value)))
   if (any(is.na(df_plot$x_value)) || any(is.na(df_plot$y_value))) stop("`x_var` and `y_var` cannot contain NA.")

@@ -12,9 +12,9 @@
 \alias{GSEA_Reactome}
 \title{Enrichment wrappers (individual)}
 \usage{
-ORA_GO(gene, simplify = T)
+ORA_GO(gene, simplify = TRUE)
 
-GSEA_GO(geneList, simplify = T)
+GSEA_GO(geneList, simplify = TRUE)
 
 ORA_KEGG(gene, input = "SYMBOL")
 

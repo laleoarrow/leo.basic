@@ -11,7 +11,7 @@ plot_prism_lollipop(
   group_var = NULL,
   color_palette = NULL,
   y_label = "Value",
-  y_as_percent = F,
+  y_as_percent = FALSE,
   plot_title = NULL,
   segment_width = 1,
   point_size = 4,
