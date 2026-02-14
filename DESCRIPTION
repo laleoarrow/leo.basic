@@ -32,7 +32,4 @@ Suggests:
     patchwork,
     ReactomePA
 Remotes:
-    github::showteeth/ggpie,
-    bioc::clusterProfiler,
-    bioc::ReactomePA,
-    bioc::org.Hs.eg.db
+    github::showteeth/ggpie

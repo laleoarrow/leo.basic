@@ -6,7 +6,9 @@
 ^\.RData$
 ^\.RDataTmp$
 ^\.Rcheck$
-^\.\.Rcheck$
+\.\.Rcheck$
 ^\.git$
 ^\.gitattributes$
 ^\.gitignore$
+^.*\.DS_Store$
+^.*\.Rhistory$
