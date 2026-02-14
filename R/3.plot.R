@@ -36,7 +36,7 @@ plot_pie <- function(x, colors=NULL, color_alpha = 1, type=c("num","ratio"), rin
   # --- build df for ggpie/ggdonut ---
   # ggpie uses a data.frame with 'group' and 'count' (even if you conceptually pass ratios)
   df <- data.frame(group = names(x), count = as.numeric(x), stringsAsFactors = FALSE)
-  label_info <- if (type == "num") "all" else "ratio"
+  label_info <- if (type == "num") c("count", "ratio") else "ratio"
 
   # --- route: pie vs donut (ring_ratio -> r0,r1) ---
   ring_ratio <- max(0, min(1, ring_ratio)); r0 <- 1 - ring_ratio; r1 <- 1
