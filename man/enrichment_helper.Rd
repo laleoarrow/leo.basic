@@ -38,9 +38,9 @@ Named numeric vector whose names are unique ENTREZID (descending)
 Utilities to format gene lists and collapse IDs for KEGG/Reactome GSEA/ORA.
 \itemize{
 \item You can download gmt file from
-https://maayanlab.cloud/Enrichr/#libraries
+\url{https://maayanlab.cloud/Enrichr/#libraries}
 \item Tutorial:
-https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist
+\url{https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist}
 }
 
 Build a named numeric vector sorted decreasingly

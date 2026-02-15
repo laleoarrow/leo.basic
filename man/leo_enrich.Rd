@@ -35,7 +35,6 @@ using ORA or GSEA; iterate method first, then background.
 }
 \examples{
 \dontrun{
-#' @examples
 # We here use SYMBOL in the first place
 library(org.Hs.eg.db)
 data(geneList, package="DOSE")

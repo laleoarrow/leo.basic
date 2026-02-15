@@ -59,7 +59,18 @@ ORA/GSEA wrappers for GO, KEGG, KEGG Module, and Reactome.
 }
 \details{
 Enrichment wrappers (individual)
+}
+\section{Functions}{
 
+\itemize{
+\item \code{ORA_GO}, \code{GSEA_GO}
+\item \code{ORA_KEGG}, \code{GSEA_KEGG}
+\item \code{ORA_MKEGG}, \code{GSEA_MKEGG}
+\item \code{ORA_Reactome}, \code{GSEA_Reactome}
+}
+}
+
+\examples{
 \dontrun{
 # KEGG vis notes:
 # https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-kegg.html
@@ -80,16 +91,6 @@ hsa04110 <- pathview(
 )
 }
 }
-\section{Functions}{
-
-\itemize{
-\item \code{ORA_GO}, \code{GSEA_GO}
-\item \code{ORA_KEGG}, \code{GSEA_KEGG}
-\item \code{ORA_MKEGG}, \code{GSEA_MKEGG}
-\item \code{ORA_Reactome}, \code{GSEA_Reactome}
-}
-}
-
 \seealso{
 leo_enrich
 }

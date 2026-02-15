@@ -7,9 +7,9 @@ utils::globalVariables(c("ENTREZID", "score"))
 #' @title Enrichment helpers
 #' @description Utilities to format gene lists and collapse IDs for KEGG/Reactome GSEA/ORA.
 #' * You can download gmt file from
-#'   https://maayanlab.cloud/Enrichr/#libraries
+#'   \url{https://maayanlab.cloud/Enrichr/#libraries}
 #' * Tutorial:
-#'   https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist
+#'   \url{https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist}
 #' @section Functions:
 #' - \code{format_geneList}: make a named numeric vector sorted decreasingly
 #' - \code{format_gene_str2vec}: split core_enrichment string into gene vector
@@ -141,8 +141,7 @@ GSEA_GO <- function(geneList, simplify = TRUE) {
 #' @param gene SYMBOL or ENTREZID vector depending on input
 #' @param input "SYMBOL" or "ENTREZID"
 #' @return enrichResult
-#' @export
-#' @details
+#' @examples
 #' \dontrun{
 #' # KEGG vis notes:
 #' # https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-kegg.html
@@ -162,6 +161,7 @@ GSEA_GO <- function(geneList, simplify = TRUE) {
 #'   limit      = list(gene = max(abs(geneList)), cpd = 1)
 #' )
 #' }
+#' @export
 ORA_KEGG <- function(gene, input = "SYMBOL") {
   if (input == "SYMBOL") {
     gene <- clusterProfiler::bitr(
@@ -283,7 +283,6 @@ GSEA_Reactome <- function(geneList, input = "SYMBOL") {
 #' @return A list of enrichment results per method-background combo
 #' @examples
 #' \dontrun{
-#' #' @examples
 #' # We here use SYMBOL in the first place
 #' library(org.Hs.eg.db)
 #' data(geneList, package="DOSE")
