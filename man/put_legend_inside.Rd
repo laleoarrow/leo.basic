@@ -9,7 +9,7 @@ put_legend_inside(p, x = 0.8, y = 0.8)
 \arguments{
 \item{p}{ggplot object, list of ggplot objects, or patchwork}
 
-\item{x, y}{npc coordinates in \link{0,1}, default 0.8, 0.8}
+\item{x, y}{npc coordinates in 0-1, default 0.8, 0.8}
 }
 \value{
 Same type as input with legend repositioned

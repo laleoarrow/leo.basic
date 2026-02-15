@@ -30,7 +30,8 @@ values. Internally it builds a named vector via \code{tibble::deframe()}, then
 applies \code{dplyr::recode()} with splicing (\code{!!!}) to perform the recoding.
 }
 \details{
-就是要recode的时候就建立有两列的df,然后用deframe()然后recode(列, !!!name_vector)
+Build a 2-col mapping df, use deframe() then
+recode(col, !!!name_vector).
 }
 \examples{
 library(dplyr)

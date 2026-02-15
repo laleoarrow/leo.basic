@@ -27,7 +27,8 @@ plot_prism_lollipop(
 
 \item{group_var}{Optional bare column name for grouping; if NULL, a single series is plotted.}
 
-\item{color_palette}{Named vector of colors for each group; for single-series, first color is used.}
+\item{color_palette}{Named vector of colors for each group;
+for single-series, first color is used.}
 
 \item{y_label}{Label for the y-axis.}
 
@@ -45,18 +46,29 @@ plot_prism_lollipop(
 A \code{ggplot2} object.
 }
 \description{
-Create a lollipop plot with Prism-style x-axis brackets, suitable for grouped or single-series data.
+Create a lollipop plot with Prism-style x-axis brackets,
+suitable for grouped or single-series data.
 }
 \examples{
 # Single-series example
 df_single <- data.frame(Stage = LETTERS[1:5], Rate = c(0.12, 0.14, 0.2, 0.17, 0.22))
-plot_prism_lollipop(df_single, Stage, Rate, color_palette = c("#0072B2"), y_label = "Conversion Rate (\%)",
-                    y_as_percent = TRUE, plot_title = "Single Series Lollipop Plot")
+plot_prism_lollipop(
+  df_single, Stage, Rate,
+  color_palette = c("#0072B2"),
+  y_label = "Conversion Rate (\%)",
+  y_as_percent = TRUE,
+  plot_title = "Single Series Lollipop Plot"
+)
 
 # Grouped example
 df_grouped <- data.frame(Category = rep(LETTERS[1:5], 2), Score = runif(10, 0.3, 0.6),
                          Group = rep(c("G1", "G2"), each = 5))
 pal <- c("G1" = "#E69F00", "G2" = "#56B4E9")
-plot_prism_lollipop(df_grouped, Category, Score, Group, color_palette = pal, y_label = "Score (\%)",
-                    y_as_percent = TRUE, plot_title = "Grouped Lollipop Plot")
+plot_prism_lollipop(
+  df_grouped, Category, Score, Group,
+  color_palette = pal,
+  y_label = "Score (\%)",
+  y_as_percent = TRUE,
+  plot_title = "Grouped Lollipop Plot"
+)
 }

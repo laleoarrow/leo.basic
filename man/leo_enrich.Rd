@@ -30,7 +30,8 @@ leo_enrich(
 A list of enrichment results per method-background combo
 }
 \description{
-Enrichment analysis for GO/KEGG/MKEGG/Reactome using ORA or GSEA; iterate method first, then background.
+Enrichment analysis for GO/KEGG/MKEGG/Reactome
+using ORA or GSEA; iterate method first, then background.
 }
 \examples{
 \dontrun{

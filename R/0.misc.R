@@ -24,17 +24,20 @@ set_proxy <- function(enable = TRUE, host = "127.0.0.1", port = 7897, socks = TR
       https_proxy = glue::glue("http://{host}:{port}")
     )
     if (socks) Sys.setenv(all_proxy = glue::glue("socks5://{host}:{port}"))
-    leo_log("✅ Proxy enabled: {host}:{port} {if (socks) '(HTTP/HTTPS + SOCKS5)' else '(HTTP/HTTPS only)'}")
+    leo_log("Proxy enabled: {host}:{port} ",
+            "{if (socks) '(HTTP/HTTPS + SOCKS5)' ",
+            "else '(HTTP/HTTPS only)'}", level = "success")
   } else {
     Sys.unsetenv(c("http_proxy", "https_proxy", "all_proxy"))
-    leo_log("🚫 Proxy disabled.")
+    leo_log("Proxy disabled.", level = "danger")
   }
   invisible()
 }
 
 #' Install local package
 #'
-#' This function is writen as I often forget what to code when I want to install a package from local source.
+#' This function is writen as I often forget what to
+#' code when I want to install a package from local source.
 #' This now uses `pak::pkg_install()` for a consistent installation backend.
 #' Anyway, it is always good to simplify the process.
 #'
@@ -43,7 +46,9 @@ set_proxy <- function(enable = TRUE, host = "127.0.0.1", port = 7897, socks = TR
 #' @export
 install_local <- function(path) {
   if (!file.exists(path)) {
-    leo_log("Wrong path to the package source. Please check the path and try again.", level = "danger")
+    leo_log("Wrong path to the package source. ",
+            "Please check the path and try again.",
+            level = "danger")
     return(invisible())
   }
   if (!requireNamespace("pak", quietly = TRUE)) {
@@ -105,7 +110,10 @@ install_deps <- function(leo.pak = "leo.basic", ncpus = 4L, upgrade = FALSE) {
 
   specs <- switch(
     leo.pak,
-    "leo.basic" = c("showteeth/ggpie", "bioc::clusterProfiler", "bioc::ReactomePA", "bioc::org.Hs.eg.db"),
+    "leo.basic" = c(
+      "showteeth/ggpie", "bioc::clusterProfiler",
+      "bioc::ReactomePA", "bioc::org.Hs.eg.db"
+    ),
     "leo.gwas" = c(
       "laleoarrow/leo.basic", "stephenturner/annotables",
       "catboost/catboost/catboost/R-package",
@@ -125,7 +133,9 @@ install_deps <- function(leo.pak = "leo.basic", ncpus = 4L, upgrade = FALSE) {
   )
 
   if (!leo.pak %in% c("leo.basic", "leo.gwas", "leo.ukb")) {
-    leo_log("No preset dependency map for {leo.pak}; installing remote package with pak.", level = "warning")
+    leo_log("No preset dependency map for {leo.pak}; ",
+            "installing remote package with pak.",
+            level = "warning")
   }
 
   specs <- unique(specs)

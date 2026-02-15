@@ -17,7 +17,8 @@
 #'         \code{map_df[[from]]} replaced by the corresponding
 #'         \code{map_df[[to]]}; all other values in \code{x} are left unchanged.
 #' @details
-#' 就是要recode的时候就建立有两列的df,然后用deframe()然后recode(列, !!!name_vector)
+#' Build a 2-col mapping df, use deframe() then
+#' recode(col, !!!name_vector).
 #' @examples
 #' library(dplyr)
 #' map_df <- tibble::tibble(

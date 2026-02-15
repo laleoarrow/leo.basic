@@ -1,10 +1,15 @@
+# Suppress R CMD check notes for NSE variables
+utils::globalVariables(c("ENTREZID", "score"))
+
 # ======== enrichment helper ================
 #' Enrichment helpers
 #' @name enrichment_helper
 #' @title Enrichment helpers
 #' @description Utilities to format gene lists and collapse IDs for KEGG/Reactome GSEA/ORA.
-#' * You can download gmt file from https://maayanlab.cloud/Enrichr/#libraries
-#' * The tutorial for this func can refer to https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist
+#' * You can download gmt file from
+#'   https://maayanlab.cloud/Enrichr/#libraries
+#' * Tutorial:
+#'   https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist
 #' @section Functions:
 #' - \code{format_geneList}: make a named numeric vector sorted decreasingly
 #' - \code{format_gene_str2vec}: split core_enrichment string into gene vector
@@ -16,7 +21,8 @@ NULL
 #' @description Build a named numeric vector sorted decreasingly
 #' @param df A data frame with two column:
 #'  *Column 1*: 1st column is **Gene ID**
-#'  *Column 2*: 2nd column is **Gene Statistics** (e.g., fold change or other type of numerical variable, etc.)
+#'  *Column 2*: 2nd column is **Gene Statistics**
+#'  (e.g., fold change or other numerical variable)
 #' @return A named numeric vector (descending)
 #' @export
 format_geneList <- function(df) {
@@ -134,12 +140,12 @@ GSEA_GO <- function(geneList, simplify = TRUE) {
 #' @rdname enrichment_individual
 #' @param gene SYMBOL or ENTREZID vector depending on input
 #' @param input "SYMBOL" or "ENTREZID"
-#' @param organism KEGG organism code, default "hsa"
 #' @return enrichResult
 #' @export
 #' @details
-#' '''{R}
-#' # KEGG_vis_notes: https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-kegg.html
+#' \dontrun{
+#' # KEGG vis notes:
+#' # https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-kegg.html
 #' library("pathview")
 #' kk <- gseKEGG(geneList     = geneList,
 #'               keyType      = 'SYMBOL',
@@ -149,14 +155,19 @@ GSEA_GO <- function(geneList, simplify = TRUE) {
 #'               verbose      = FALSE)
 #' browseKEGG(kk, 'hsa04110')
 #' # or
-#' hsa04110 <- pathview(gene.data  = geneList,
-#'                      pathway.id = "hsa04110",
-#'                      species    = "hsa",
-#'                      limit      = list(gene=max(abs(geneList)), cpd=1))
-#' '''
+#' hsa04110 <- pathview(
+#'   gene.data  = geneList,
+#'   pathway.id = "hsa04110",
+#'   species    = "hsa",
+#'   limit      = list(gene = max(abs(geneList)), cpd = 1)
+#' )
+#' }
 ORA_KEGG <- function(gene, input = "SYMBOL") {
   if (input == "SYMBOL") {
-    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db::org.Hs.eg.db)$ENTREZID
+    gene <- clusterProfiler::bitr(
+      gene, fromType = "SYMBOL", toType = "ENTREZID",
+      OrgDb = org.Hs.eg.db::org.Hs.eg.db
+    )$ENTREZID
     gene <- unique(gene)
   }
   kk <- clusterProfiler::enrichKEGG(gene = gene,
@@ -190,7 +201,10 @@ GSEA_KEGG <- function(geneList, input = "SYMBOL"){
 #' @export
 ORA_MKEGG <- function(gene, input = "SYMBOL") {
   if (input == "SYMBOL") {
-    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db::org.Hs.eg.db)$ENTREZID
+    gene <- clusterProfiler::bitr(
+      gene, fromType = "SYMBOL", toType = "ENTREZID",
+      OrgDb = org.Hs.eg.db::org.Hs.eg.db
+    )$ENTREZID
     gene <- unique(gene)
   }
   mkk <- clusterProfiler::enrichMKEGG(gene = gene,
@@ -221,13 +235,20 @@ GSEA_MKEGG <- function(geneList, input = "SYMBOL") {
 #' @export
 ORA_Reactome <- function(gene, input = "SYMBOL") {
   if (input == "SYMBOL") {
-    gene <- clusterProfiler::bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db::org.Hs.eg.db)$ENTREZID
+    gene <- clusterProfiler::bitr(
+      gene, fromType = "SYMBOL", toType = "ENTREZID",
+      OrgDb = org.Hs.eg.db::org.Hs.eg.db
+    )$ENTREZID
     gene <- unique(gene)
   }
   reactome <- ReactomePA::enrichPathway(gene = gene,
                                         pvalueCutoff = 0.05,
                                         readable=TRUE)
-  leo.basic::leo_log("Reactome vis: https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html")
+  reactome_url <- paste0(
+    "https://yulab-smu.top/",
+    "biomedical-knowledge-mining-book/reactomepa.html"
+  )
+  leo.basic::leo_log("Reactome vis: {reactome_url}")
   return(reactome)
 }
 #' @rdname enrichment_individual
@@ -241,13 +262,18 @@ GSEA_Reactome <- function(geneList, input = "SYMBOL") {
                                      pvalueCutoff = 0.05,
                                      pAdjustMethod = "BH",
                                      verbose = FALSE)
-  leo.basic::leo_log("Reactome vis: https://yulab-smu.top/biomedical-knowledge-mining-book/reactomepa.html")
+  reactome_url <- paste0(
+    "https://yulab-smu.top/",
+    "biomedical-knowledge-mining-book/reactomepa.html"
+  )
+  leo.basic::leo_log("Reactome vis: {reactome_url}")
   return(reactome)
 }
 
 # ======== MAIN ===========================
 #' Enrichment analysis (Integrated)
-#' @description Enrichment analysis for GO/KEGG/MKEGG/Reactome using ORA or GSEA; iterate method first, then background.
+#' @description Enrichment analysis for GO/KEGG/MKEGG/Reactome
+#' using ORA or GSEA; iterate method first, then background.
 #' @param gene SYMBOL vector for ORA
 #' @param geneList Named numeric vector for GSEA (names match input)
 #' @param input "SYMBOL" or "ENTREZID" (for KEGG/MKEGG/Reactome)
@@ -278,7 +304,10 @@ leo_enrich <- function(gene, geneList, simplify = TRUE, input = "SYMBOL",
   method <- match.arg(method, several.ok = TRUE)
   background <- match.arg(background, several.ok = TRUE)
   # enrichement
-  leo_log("A total of {length(method)} methods and {length(background)} backgrounds ({length(method) * length(background)} round{?s}) enrichement will be processed.")
+  n_rounds <- length(method) * length(background)
+  leo_log("A total of {length(method)} methods and ",
+          "{length(background)} backgrounds ",
+          "({n_rounds} round{?s}) enrichment will be processed.")
   res_list <- list(); i = 0
   for (m in method) {
     for (bg in background) {

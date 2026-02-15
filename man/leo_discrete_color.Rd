@@ -7,7 +7,8 @@
 leo_discrete_color(levels = NULL, n = NULL, base_panel = NULL)
 }
 \arguments{
-\item{levels}{character; category names. If provided, output is named with \code{levels}. If NULL, use \code{n}.}
+\item{levels}{character; category names. If provided,
+output is named with \code{levels}. If NULL, use \code{n}.}
 
 \item{n}{integer; number of colors to return when \code{levels} is NULL.}
 
@@ -17,7 +18,9 @@ leo_discrete_color(levels = NULL, n = NULL, base_panel = NULL)
 character vector of hex colors; named if \code{levels} is provided.
 }
 \description{
-Return \code{n} distinct colors or a named vector for \code{levels}. Uses a fixed base panel and expands smoothly if more colors are needed.
+Return \code{n} distinct colors or a named
+vector for \code{levels}. Uses a fixed base panel and
+expands smoothly if more colors are needed.
 }
 \examples{
 leo_discrete_color(n = 8)

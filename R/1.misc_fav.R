@@ -3,7 +3,8 @@
 #' @param ... The messages you wanna messgae, which will be pasted together
 #' @param color Str. Preferred color. Default is yellow.
 #'              Options are "31" (red), "32" (green), "34" (blue), "95" (light purple)...
-#' @param return Logical. If TRUE, returns the formatted string. If FALSE (Default), prints directly.
+#' @param return Logical. If TRUE, returns the formatted string.
+#'  If FALSE (Default), prints directly.
 #'
 #' @export
 #' @examples
@@ -114,10 +115,14 @@ leo_theme <- function(
 ) {
   type <- match.arg(type)
   elems <- list(
-    sprintf("    plot.title      = element_text(face = 'bold', hjust = 0, size = %s, color = 'black')", plot_title_size),
-    sprintf("    legend.title    = element_text(size = %s, face = 'bold', color = 'black')", legend_title_size),
-    sprintf("    legend.text     = element_text(size = %s, color = 'black')", legend_text_size),
-    sprintf("    axis.title      = element_text(size = %s, face = 'bold', color = 'black')", axis_title_size),
+    sprintf("    plot.title      = element_text(face = 'bold', ",
+            "hjust = 0, size = %s, color = 'black')", plot_title_size),
+    sprintf("    legend.title    = element_text(size = %s, ",
+            "face = 'bold', color = 'black')", legend_title_size),
+    sprintf("    legend.text     = element_text(size = %s, ",
+            "color = 'black')", legend_text_size),
+    sprintf("    axis.title      = element_text(size = %s, ",
+            "face = 'bold', color = 'black')", axis_title_size),
     sprintf("    axis.text       = element_text(size = %s, color = 'black')", axis_text_size),
     "    axis.title.x    = element_blank()",
     "    axis.text.x     = element_blank()",
@@ -134,11 +139,24 @@ leo_theme <- function(
     return(invisible(NULL))
   }
   ggplot2::theme(
-    plot.title       = ggplot2::element_text(face = "bold", hjust = 0, size = plot_title_size, color = "black"),
-    legend.title     = ggplot2::element_text(size = legend_title_size, face = "bold", color = "black"),
-    legend.text      = ggplot2::element_text(size = legend_text_size, color = "black"),
-    axis.title       = ggplot2::element_text(size = axis_title_size, face = "bold", color = "black"),
-    axis.text        = ggplot2::element_text(size = axis_text_size, color = "black"),
+    plot.title       = ggplot2::element_text(
+      face = "bold", hjust = 0,
+      size = plot_title_size, color = "black"
+    ),
+    legend.title     = ggplot2::element_text(
+      size = legend_title_size, face = "bold",
+      color = "black"
+    ),
+    legend.text      = ggplot2::element_text(
+      size = legend_text_size, color = "black"
+    ),
+    axis.title       = ggplot2::element_text(
+      size = axis_title_size, face = "bold",
+      color = "black"
+    ),
+    axis.text        = ggplot2::element_text(
+      size = axis_text_size, color = "black"
+    ),
     axis.title.x     = ggplot2::element_blank(),
     axis.text.x      = ggplot2::element_blank(),
     axis.ticks.x     = ggplot2::element_blank(),
@@ -252,7 +270,10 @@ vd <- function(df) {
 
   # 2. Temp file creation
   # Tips for Visidata usage
-  leo_log("Launching Visidata... [Tips: Shift+F:Freq/Filter, Shift+S:Sheets, -/+:Select, q:Back]", level = "info")
+  leo_log("Launching Visidata... ",
+          "[Tips: Shift+F:Freq/Filter, ",
+          "Shift+S:Sheets, -/+:Select, q:Back]",
+          level = "info")
   tmp_file <- tempfile(pattern = "vd_r_data_", fileext = ".csv")
   
   # 3. Fast Write: data.table > vroom > base

@@ -36,8 +36,6 @@ GSEA_Reactome(geneList, input = "SYMBOL")
 \item{geneList}{Named numeric vector (SYMBOL or ENTREZID per input)}
 
 \item{input}{"SYMBOL" or "ENTREZID"}
-
-\item{organism}{KEGG organism code, default "hsa"}
 }
 \value{
 enrichResult
@@ -62,7 +60,25 @@ ORA/GSEA wrappers for GO, KEGG, KEGG Module, and Reactome.
 \details{
 Enrichment wrappers (individual)
 
-'''{R}
+\dontrun{
+# KEGG vis notes:
+# https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-kegg.html
+library("pathview")
+kk <- gseKEGG(geneList     = geneList,
+              keyType      = 'SYMBOL',
+              organism     = 'hsa',
+              minGSSize    = 120,
+              pvalueCutoff = 0.05,
+              verbose      = FALSE)
+browseKEGG(kk, 'hsa04110')
+# or
+hsa04110 <- pathview(
+  gene.data  = geneList,
+  pathway.id = "hsa04110",
+  species    = "hsa",
+  limit      = list(gene = max(abs(geneList)), cpd = 1)
+)
+}
 }
 \section{Functions}{
 
@@ -72,25 +88,6 @@ Enrichment wrappers (individual)
 \item \code{ORA_MKEGG}, \code{GSEA_MKEGG}
 \item \code{ORA_Reactome}, \code{GSEA_Reactome}
 }
-}
-
-\section{KEGG_vis_notes: https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-kegg.html}{
-library("pathview")
-kk <- gseKEGG(geneList     = geneList,
-keyType      = 'SYMBOL',
-organism     = 'hsa',
-minGSSize    = 120,
-pvalueCutoff = 0.05,
-verbose      = FALSE)
-browseKEGG(kk, 'hsa04110')
-}
-
-\section{or}{
-hsa04110 <- pathview(gene.data  = geneList,
-pathway.id = "hsa04110",
-species    = "hsa",
-limit      = list(gene=max(abs(geneList)), cpd=1))
-'''
 }
 
 \seealso{

@@ -12,7 +12,8 @@ leo_message(..., color = "31", return = FALSE)
 \item{color}{Str. Preferred color. Default is yellow.
 Options are "31" (red), "32" (green), "34" (blue), "95" (light purple)...}
 
-\item{return}{Logical. If TRUE, returns the formatted string. If FALSE (Default), prints directly.}
+\item{return}{Logical. If TRUE, returns the formatted string.
+If FALSE (Default), prints directly.}
 }
 \description{
 Give messages with my color

@@ -16,7 +16,8 @@ prep_GSEA_geneList(geneList_sym)
 \arguments{
 \item{df}{A data frame with two column:
 \emph{Column 1}: 1st column is \strong{Gene ID}
-\emph{Column 2}: 2nd column is \strong{Gene Statistics} (e.g., fold change or other type of numerical variable, etc.)}
+\emph{Column 2}: 2nd column is \strong{Gene Statistics}
+(e.g., fold change or other numerical variable)}
 
 \item{x}{A character vector or a list of character vectors}
 
@@ -36,8 +37,10 @@ Named numeric vector whose names are unique ENTREZID (descending)
 \description{
 Utilities to format gene lists and collapse IDs for KEGG/Reactome GSEA/ORA.
 \itemize{
-\item You can download gmt file from https://maayanlab.cloud/Enrichr/#libraries
-\item The tutorial for this func can refer to https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist
+\item You can download gmt file from
+https://maayanlab.cloud/Enrichr/#libraries
+\item Tutorial:
+https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist
 }
 
 Build a named numeric vector sorted decreasingly

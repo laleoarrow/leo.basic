@@ -25,11 +25,13 @@ Imports:
     tibble
 Suggests:
     clusterProfiler,
+    data.table,
     ggpie,
     ggrastr,
     org.Hs.eg.db,
     pak,
     patchwork,
-    ReactomePA
+    ReactomePA,
+    vroom
 Remotes:
     github::showteeth/ggpie

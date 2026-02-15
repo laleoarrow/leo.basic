@@ -92,7 +92,8 @@ leo_permutation_test <- function(data,
   } else {
     stop("Unsupported input: supply (numeric feature, class_vec) or (data.frame like object).")
   }
-  if (length(levels(group_vec)) != 2) stop("`class_vec` (or class column) must have exactly two levels.")
+  if (length(levels(group_vec)) != 2)
+    stop("`class_vec` (or class column) must have exactly two levels.")
 
   ## -------- main loop -------------------------------------------------------
   res <- tibble::tibble(Feature = feature_names,

@@ -10,7 +10,8 @@ install_local(path)
 \item{path}{The path to the local package source.}
 }
 \description{
-This function is writen as I often forget what to code when I want to install a package from local source.
+This function is writen as I often forget what to
+code when I want to install a package from local source.
 This now uses \code{pak::pkg_install()} for a consistent installation backend.
 Anyway, it is always good to simplify the process.
 }

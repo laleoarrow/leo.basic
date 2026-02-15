@@ -15,7 +15,8 @@ rasterize_layers(
 
 \item{dpi}{Integer DPI for rasterization (default 300).}
 
-\item{layers}{Character vector of layer types to rasterize, e.g. c("Point","Jitter","Line","Segment","EdgeSegment").}
+\item{layers}{Character vector of layer types to rasterize,
+e.g. c("Point", "Jitter", "Line", "Segment").}
 }
 \value{
 ggplot object with target layers rasterized.

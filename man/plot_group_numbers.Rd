@@ -61,8 +61,12 @@ beeswarm arrangement, color / shape / size encoding, plus optional mean indicato
 •  0 □,  2 △,  6 ▽  — hollow.
 •  3 “+”,  4 “×”,  1 ○ — thin strokes, suit overlaps.
 • 21–25 accept border (\code{colour}) + fill.
-For filled point with black outline: shape = 21, \code{colour = "black"}, \code{fill = "<fill>"}, tweak \code{stroke}.
-Provide *_col or *_rule, or leave both NULL → defaults (colour: sig/pos = red, sig/neg = blue, else grey; shape 16; size 2).
+For filled point with black outline: shape = 21,
+\code{colour = "black"}, \code{fill = "<fill>"},
+tweak \code{stroke}.
+Provide *_col or *_rule, or leave both NULL.
+Defaults: colour sig/pos=red, sig/neg=blue, else grey;
+shape 16; size 2.
 }
 \examples{
 set.seed(1)
