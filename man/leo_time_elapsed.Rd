@@ -20,27 +20,25 @@ If \code{return = FALSE} (default), prints the elapsed time in a formatted strin
 Compute and format the time difference between \strong{now} and \code{start_time},
 choosing the most appropriate unit automatically:
 \itemize{
-\item \verb{< 1 s}    → \strong{milliseconds (ms)}
-\item \verb{< 60 s}   → \strong{seconds (sec)}
-\item \verb{< 1 h}    → \strong{minutes (min)}
-\item \verb{< 1 day}  → \strong{hours (hr)}
-\item \verb{< 1 week} → \strong{days (day)}
-\item \verb{< 1 month}→ \strong{weeks (wk)}
-\item \verb{< 1 year} → \strong{months (mon)}
-\item otherwise → \strong{years (yr)}
+\item \verb{< 1 s}    -> \strong{milliseconds (ms)}
+\item \verb{< 60 s}   -> \strong{seconds (sec)}
+\item \verb{< 1 h}    -> \strong{minutes (min)}
+\item \verb{< 1 day}  -> \strong{hours (hr)}
+\item \verb{< 1 week} -> \strong{days (day)}
+\item \verb{< 1 month}-> \strong{weeks (wk)}
+\item \verb{< 1 year} -> \strong{months (mon)}
+\item otherwise -> \strong{years (yr)}
 }
 }
 \examples{
-t0 <- Sys.time()
-Sys.sleep(0.123)
-leo_time_elapsed(t0) # → [12:34:56] Elapsed 125 ms
+t0 <- Sys.time() - 0.123
+leo_time_elapsed(t0) # -> [12:34:56] Elapsed 125 ms
 
-t1 <- Sys.time()
-Sys.sleep(3.5)
-leo_time_elapsed(t1) # → [12:35:00] Elapsed 3.5 sec
+t1 <- Sys.time() - 3.5
+leo_time_elapsed(t1) # -> [12:35:00] Elapsed 3.5 sec
 
 # Capture string without printing
-t2 <- Sys.time(); Sys.sleep(61)
+t2 <- Sys.time() - 61
 elapsed_str <- leo_time_elapsed(t2, return = TRUE)
 print(elapsed_str) # "1.08 min"
 }

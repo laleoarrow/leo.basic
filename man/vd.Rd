@@ -2,22 +2,28 @@
 % Please edit documentation in R/1.misc_fav.R
 \name{vd}
 \alias{vd}
-\title{View DataFrame with Visidata from Terminal}
+\title{View DataFrame with VisiData from Terminal}
 \usage{
 vd(df)
 }
 \arguments{
-\item{df}{Dataframe or matrix to view.}
+\item{df}{Data frame, tibble, or matrix to view.}
+}
+\value{
+Invisibly returns \code{df}.
 }
 \description{
-Opens a dataframe in Visidata (\code{vd}) from the R console.
-Uses \code{data.table} or \code{vroom} for fast writing if available.
+\code{vd()} writes \code{df} to a temporary TSV file, then opens it with VisiData.
+This keeps the R side simple while letting VisiData read the table lazily from disk,
+which is much more usable for large data frames than printing them in the console.
+Non-default row names are preserved as the first column.
+A compact terminal summary is printed before launch, including dimensions,
+row-name handling, temp-file size, and writer backend.
 }
 \examples{
 \dontrun{
-  data(mtcars)
-  vd(mtcars)
-  # Pipe support
-  mtcars \%>\% vd()
+data(mtcars)
+vd(mtcars)
+mtcars \%>\% vd()
 }
 }

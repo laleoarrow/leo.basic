@@ -40,17 +40,17 @@ A tibble with three columns:
 Compare one or multiple numeric features between two groups
 using permutation-based tests from \strong{coin}. Two usage modes:
 \enumerate{
-\item \strong{Vector mode} – supply a numeric vector \code{data} and a grouping
+\item \strong{Vector mode} - supply a numeric vector \code{data} and a grouping
 vector \code{class_vec}.
-\item \strong{Data-frame mode} – supply a data.frame \code{data} plus the
+\item \strong{Data-frame mode} - supply a data.frame \code{data} plus the
 column name holding the groups (\code{class_col}) and, optionally,
 the feature columns (\code{feature_cols}).
 }
 Workflow per feature:
 \itemize{
-\item Normality test — Shapiro–Wilk for \eqn{n ≤ 5000}, Anderson–Darling
+\item Normality test - Shapiro-Wilk for \eqn{n <= 5000}, Anderson-Darling
 for \eqn{n > 5000}.
-\item Variance homogeneity — F-test.
+\item Variance homogeneity - F-test.
 \item If both criteria hold, run \code{coin::oneway_test}; otherwise run
 \code{coin::wilcox_test}.
 }

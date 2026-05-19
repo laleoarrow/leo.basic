@@ -29,15 +29,15 @@ plot_group_numbers(
 
 \item{color_col}{column name (chr) for point color (skip \code{color_rule}).}
 
-\item{color_rule}{function(df) → color vector; ignored if \code{color_col} given.}
+\item{color_rule}{function(df) -> color vector; ignored if \code{color_col} given.}
 
 \item{shape_col}{column name (chr) for point shape (skip \code{shape_rule}).}
 
-\item{shape_rule}{function(df) → shape vector; ignored if \code{shape_col} given.}
+\item{shape_rule}{function(df) -> shape vector; ignored if \code{shape_col} given.}
 
 \item{size_col}{column name (chr) for point size (skip \code{size_rule}).}
 
-\item{size_rule}{function(df) → size vector; ignored if \code{size_col} given.}
+\item{size_rule}{function(df) -> size vector; ignored if \code{size_col} given.}
 
 \item{jitter}{one of \code{"no"}, \code{"yes"}, \code{"bee"}.}
 
@@ -57,16 +57,18 @@ beeswarm arrangement, color / shape / size encoding, plus optional mean indicato
 }
 \note{
 \strong{Shape tips} (ggplot shape codes):
-• 24 ▲, 25 ▼, 22 ■  — filled; outline via \code{stroke}.
-•  0 □,  2 △,  6 ▽  — hollow.
-•  3 “+”,  4 “×”,  1 ○ — thin strokes, suit overlaps.
-• 21–25 accept border (\code{colour}) + fill.
+\itemize{
+\item 24, 25, 22: filled; outline via \code{stroke}.
+\item 0, 2, 6: hollow.
+\item 3, 4, 1: thin strokes, suit overlaps.
+\item 21-25 accept border (\code{colour}) + fill.
 For filled point with black outline: shape = 21,
 \code{colour = "black"}, \code{fill = "<fill>"},
 tweak \code{stroke}.
 Provide *_col or *_rule, or leave both NULL.
 Defaults: colour sig/pos=red, sig/neg=blue, else grey;
 shape 16; size 2.
+}
 }
 \examples{
 set.seed(1)

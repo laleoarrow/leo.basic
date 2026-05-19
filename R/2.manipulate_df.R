@@ -1,4 +1,4 @@
-#' Recode a Vector Using a Two‐Column Mapping Table
+#' Recode a Vector Using a Two-Column Mapping Table
 #'
 #' This function takes a vector \code{x} and a mapping data frame \code{map_df}
 #' that has two columns: one with the original values and one with the replacement

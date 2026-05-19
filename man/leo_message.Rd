@@ -23,5 +23,5 @@ leo_message("This is a red message", color = "31")
 leo_message("This is a green message", "\nhaha", color = "32")
 leo_message("This is a blue ", "message", color = "34")
 leo_message("This is a light purple message", color = "95")
-leo_message(" 🦁🦁🦁 Welcome to use the LEO package ! 🦁🦁🦁")
+leo_message("Welcome to use the LEO package!")
 }

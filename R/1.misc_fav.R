@@ -12,7 +12,7 @@
 #' leo_message("This is a green message", "\nhaha", color = "32")
 #' leo_message("This is a blue ", "message", color = "34")
 #' leo_message("This is a light purple message", color = "95")
-#' leo_message(" 🦁🦁🦁 Welcome to use the LEO package ! 🦁🦁🦁")
+#' leo_message("Welcome to use the LEO package!")
 leo_message <- function(..., color = "31", return = FALSE) {
   message_content <- paste0(..., collapse = " ")
   formatted_message <- paste0("\033[", color, "m", message_content, "\033[0m")
@@ -53,6 +53,28 @@ leo_log <- function(..., level = "info", verbose = TRUE) {
          "warning" = cli::cli_alert_warning(formatted_message, .envir = parent.frame()),
          "danger"  = cli::cli_alert_danger(formatted_message, .envir = parent.frame())
   )
+  invisible()
+}
+
+#' Stop execution with formatted message
+#'
+#' Combines `leo_log(..., level = "danger")` with `stop()` for consistent error handling.
+#' Prints a timestamped red message before stopping execution.
+#'
+#' @param ... Messages to combine (passed to `leo_log`)
+#' @param call. Logical; if FALSE (default), the call is not included in error message
+#'
+#' @return This function never returns; it stops execution with an error.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' if (!is.data.frame(df)) leo_stop("df must be a data.frame.")
+#' }
+leo_stop <- function(..., call. = FALSE) {
+  msg <- paste(...)
+  leo_log(msg, level = "danger")
+  stop(msg, call. = call.)
 }
 
 #' Generate a custom colour palette
@@ -173,14 +195,14 @@ leo_theme <- function(
 #'
 #' Compute and format the time difference between **now** and `start_time`,
 #' choosing the most appropriate unit automatically:
-#' * `< 1 s`    → **milliseconds (ms)**
-#' * `< 60 s`   → **seconds (sec)**
-#' * `< 1 h`    → **minutes (min)**
-#' * `< 1 day`  → **hours (hr)**
-#' * `< 1 week` → **days (day)**
-#' * `< 1 month`→ **weeks (wk)**
-#' * `< 1 year` → **months (mon)**
-#' * otherwise → **years (yr)**
+#' * `< 1 s`    -> **milliseconds (ms)**
+#' * `< 60 s`   -> **seconds (sec)**
+#' * `< 1 h`    -> **minutes (min)**
+#' * `< 1 day`  -> **hours (hr)**
+#' * `< 1 week` -> **days (day)**
+#' * `< 1 month`-> **weeks (wk)**
+#' * `< 1 year` -> **months (mon)**
+#' * otherwise -> **years (yr)**
 #'
 #' @param start_time POSIXct. output from `Sys.time()`.
 #' @param digits     Integer. digits to keep (defaut: 2).
@@ -188,16 +210,14 @@ leo_theme <- function(
 #'
 #' @return If `return = FALSE` (default), prints the elapsed time in a formatted string
 #' @examples
-#' t0 <- Sys.time()
-#' Sys.sleep(0.123)
-#' leo_time_elapsed(t0) # → [12:34:56] Elapsed 125 ms
+#' t0 <- Sys.time() - 0.123
+#' leo_time_elapsed(t0) # -> [12:34:56] Elapsed 125 ms
 #'
-#' t1 <- Sys.time()
-#' Sys.sleep(3.5)
-#' leo_time_elapsed(t1) # → [12:35:00] Elapsed 3.5 sec
+#' t1 <- Sys.time() - 3.5
+#' leo_time_elapsed(t1) # -> [12:35:00] Elapsed 3.5 sec
 #'
 #' # Capture string without printing
-#' t2 <- Sys.time(); Sys.sleep(61)
+#' t2 <- Sys.time() - 61
 #' elapsed_str <- leo_time_elapsed(t2, return = TRUE)
 #' print(elapsed_str) # "1.08 min"
 #' @export
@@ -223,77 +243,117 @@ leo_time_elapsed <- function(start_time, digits = 2, return = FALSE) {
   invisible(out)
 }
 
-#' View DataFrame with Visidata from Terminal
+#' View DataFrame with VisiData from Terminal
 #'
-#' Opens a dataframe in Visidata (`vd`) from the R console.
-#' Uses `data.table` or `vroom` for fast writing if available.
+#' `vd()` writes `df` to a temporary TSV file, then opens it with VisiData.
+#' This keeps the R side simple while letting VisiData read the table lazily from disk,
+#' which is much more usable for large data frames than printing them in the console.
+#' Non-default row names are preserved as the first column.
+#' A compact terminal summary is printed before launch, including dimensions,
+#' row-name handling, temp-file size, and writer backend.
 #'
-#' @param df   Dataframe or matrix to view.
+#' @param df Data frame, tibble, or matrix to view.
+#'
+#' @return Invisibly returns `df`.
 #'
 #' @export
 #' @examples
 #' \dontrun{
-#'   data(mtcars)
-#'   vd(mtcars)
-#'   # Pipe support
-#'   mtcars %>% vd()
+#' data(mtcars)
+#' vd(mtcars)
+#' mtcars %>% vd()
 #' }
 vd <- function(df) {
-  if (missing(df)) {
-    cli::cli_alert_danger("Usage: vd(dataframe)")
-    return(invisible(NULL))
+  if (missing(df)) leo_stop("Usage: vd(df)")
+  if (is.matrix(df)) df <- as.data.frame(df, stringsAsFactors = FALSE)
+  if (!is.data.frame(df)) leo_stop("`df` must be a data.frame or matrix.")
+
+  fmt_bytes <- function(x) {
+    units <- c("B", "KB", "MB", "GB", "TB")
+    x <- as.numeric(x)[1]
+    if (is.na(x) || x < 0) return(NA_character_)
+    i <- 1
+    while (x >= 1024 && i < length(units)) {
+      x <- x / 1024
+      i <- i + 1
+    }
+    if (i == 1) sprintf("%.0f %s", x, units[i]) else sprintf("%.2f %s", x, units[i])
+  }
+  align_ansi <- function(x, width) {
+    x <- as.character(x)
+    pad <- strrep(" ", max(0, width - nchar(cli::ansi_strip(x), type = "width")))
+    paste0(x, pad)
   }
 
-  # 1. Check for 'vd' command
-  vd_cmd <- Sys.which("vd")
-  if (vd_cmd == "") {
-    # Fallback check for common user paths (especially for pip install --user)
-    common_paths <- c(
-      file.path(Sys.getenv("HOME"), ".local/bin/vd"),
-      "/opt/homebrew/bin/vd", "/usr/local/bin/vd"
-    )
-    for (p in common_paths) {
-      if (file.exists(p)) {
-        vd_cmd <- p
-        break
-      }
+  vd_opt <- getOption("leo.basic.vd_cmd")
+  if (isFALSE(vd_opt) || (length(vd_opt) == 1 && is.na(vd_opt))) {
+    vd_cmd <- ""
+  } else if (is.character(vd_opt) && length(vd_opt) == 1 && nzchar(vd_opt)) {
+    vd_cmd <- if (file.exists(vd_opt) || nzchar(Sys.which(vd_opt))) vd_opt else ""
+  } else {
+    vd_cmd <- Sys.which("vd")
+    if (!nzchar(vd_cmd)) {
+      common_paths <- c(file.path(Sys.getenv("HOME"), ".local/bin/vd"), "/opt/homebrew/bin/vd", "/usr/local/bin/vd")
+      hit <- common_paths[file.exists(common_paths)][1]
+      vd_cmd <- if (length(hit) == 0 || is.na(hit)) "" else hit
     }
   }
-
-  if (vd_cmd == "") {
-    hint <- switch(Sys.info()[["sysname"]],
-      Darwin  = "'brew/pip install visidata'",
-      Linux   = "'apt/yum/pip install visidata'",
-      Windows = "'choco/pip install visidata'",
-      "'pip install visidata'"
-    )
-    cli::cli_alert_warning(glue::glue("Visidata (vd) not found. Please install via {hint}"))
+  if (!nzchar(vd_cmd)) {
+    cli::cli_alert_warning("VisiData (vd) not found. Install it with brew install visidata or pip install visidata.")
     return(invisible(df))
   }
 
-  # 2. Temp file creation
-  # Tips for Visidata usage
-  leo_log("Launching Visidata... ",
-          "[Tips: Shift+F:Freq/Filter, ",
-          "Shift+S:Sheets, -/+:Select, q:Back]",
-          level = "info")
-  tmp_file <- tempfile(pattern = "vd_r_data_", fileext = ".csv")
-  
-  # 3. Fast Write: data.table > vroom > base
-  if (requireNamespace("data.table", quietly = TRUE)) {
-    data.table::fwrite(df, tmp_file, showProgress = FALSE)
-  } else if (requireNamespace("vroom", quietly = TRUE)) {
-    vroom::vroom_write(df, tmp_file, delim = ",", progress = FALSE)
-  } else {
-    utils::write.csv(df, tmp_file, row.names = FALSE)
+  row_col <- NULL
+  df_out <- df
+  rn <- rownames(df)
+  if (!is.null(rn) && !identical(rn, as.character(seq_len(nrow(df))))) {
+    row_col <- ".rowname"
+    while (row_col %in% names(df_out)) row_col <- paste0(row_col, "_")
+    df_out[[row_col]] <- rn
+    df_out <- df_out[, c(row_col, setdiff(names(df_out), row_col)), drop = FALSE]
+    rownames(df_out) <- NULL
   }
 
-  # 4. Execute Visidata
-  system2(vd_cmd, args = c(tmp_file), wait = TRUE)
+  tmp_file <- tempfile(pattern = "vd_", fileext = ".tsv")
+  on.exit(if (file.exists(tmp_file)) unlink(tmp_file), add = TRUE)
+  writer <- if (requireNamespace("data.table", quietly = TRUE)) {
+    data.table::fwrite(df_out, tmp_file, sep = "\t", showProgress = FALSE)
+    "fwrite"
+  } else if (requireNamespace("vroom", quietly = TRUE)) {
+    vroom::vroom_write(df_out, tmp_file, delim = "\t", progress = FALSE)
+    "vroom_write"
+  } else {
+    utils::write.table(df_out, tmp_file, sep = "\t", quote = TRUE, row.names = FALSE)
+    "write.table"
+  }
 
-  # 5. Cleanup
-  if (file.exists(tmp_file)) unlink(tmp_file)
-  leo_log("Visidata closed", level = "success")
-  
+  rowname_value <- if (is.null(row_col)) cli::col_yellow("none/default") else cli::col_green(paste0("yes (", row_col, ")"))
+  writer_value <- switch(
+    writer,
+    "fwrite" = cli::col_magenta("fwrite"),
+    "vroom_write" = cli::col_blue("vroom_write"),
+    cli::col_cyan("write.table")
+  )
+  header <- c("Rows", "Cols", "Rowname", "File size", "Writer")
+  value <- c(
+    cli::col_cyan(as.character(nrow(df))),
+    cli::col_cyan(as.character(ncol(df))),
+    rowname_value,
+    cli::col_green(fmt_bytes(file.info(tmp_file)$size)),
+    writer_value
+  )
+  width <- pmax(nchar(header, type = "width"), nchar(cli::ansi_strip(value), type = "width"))
+  rule <- paste(vapply(width, function(w) strrep("-", w), character(1)), collapse = "-+-")
+  path_line <- paste0(cli::col_yellow("Temp file >>> "), cli::col_yellow(tmp_file))
+
+  cat(cli::style_bold(cli::col_cyan("VisiData summary")), "\n")
+  cat(paste(mapply(align_ansi, cli::col_cyan(header), width), collapse = " | "), "\n")
+  cat(rule, "\n")
+  cat(paste(mapply(align_ansi, value, width), collapse = " | "), "\n")
+  cat(rule, "\n")
+  cat(path_line, "\n")
+
+  status <- system2(vd_cmd, args = tmp_file, wait = TRUE, stdout = FALSE, stderr = FALSE)
+  if (!identical(status, 0L)) leo_stop("VisiData exited with status {status}.")
   invisible(df)
 }

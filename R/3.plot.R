@@ -64,7 +64,7 @@ plot_pie <- function(x, colors = NULL, color_alpha = 1,
   # --- build df for ggpie/ggdonut ---
   # ggpie uses a data.frame with 'group' and 'count' (even if you conceptually pass ratios)
   df <- data.frame(group = names(x), count = as.numeric(x), stringsAsFactors = FALSE)
-  label_info <- if (type == "num") c("count", "ratio") else "ratio"
+  label_info <- if (type == "num") "all" else "ratio"
 
   # --- route: pie vs donut (ring_ratio -> r0,r1) ---
   ring_ratio <- max(0, min(1, ring_ratio)); r0 <- 1 - ring_ratio; r1 <- 1
@@ -108,11 +108,11 @@ plot_pie <- function(x, colors = NULL, color_alpha = 1,
 #' @param group        column name (chr) mapped to x-axis categories.
 #' @param number       column name (chr) mapped to y-axis numeric values.
 #' @param color_col    column name (chr) for point color (skip \code{color_rule}).
-#' @param color_rule   function(df) → color vector; ignored if \code{color_col} given.
+#' @param color_rule   function(df) -> color vector; ignored if \code{color_col} given.
 #' @param shape_col    column name (chr) for point shape (skip \code{shape_rule}).
-#' @param shape_rule   function(df) → shape vector; ignored if \code{shape_col} given.
+#' @param shape_rule   function(df) -> shape vector; ignored if \code{shape_col} given.
 #' @param size_col     column name (chr) for point size (skip \code{size_rule}).
-#' @param size_rule    function(df) → size vector; ignored if \code{size_col} given.
+#' @param size_rule    function(df) -> size vector; ignored if \code{size_col} given.
 #' @param jitter       one of \code{"no"}, \code{"yes"}, \code{"bee"}.
 #' @param x_axis_pos   \code{"default"} or \code{"zero"} (draw baseline at y = 0).
 #' @param mean_type    \code{"none"}, \code{"point"}, \code{"line"}.
@@ -122,10 +122,10 @@ plot_pie <- function(x, colors = NULL, color_alpha = 1,
 #'
 #' @note
 #' **Shape tips** (ggplot shape codes):
-#' • 24 ▲, 25 ▼, 22 ■  — filled; outline via \code{stroke}.
-#' •  0 □,  2 △,  6 ▽  — hollow.
-#' •  3 “+”,  4 “×”,  1 ○ — thin strokes, suit overlaps.
-#' • 21–25 accept border (\code{colour}) + fill.
+#' * 24, 25, 22: filled; outline via \code{stroke}.
+#' * 0, 2, 6: hollow.
+#' * 3, 4, 1: thin strokes, suit overlaps.
+#' * 21-25 accept border (\code{colour}) + fill.
 #'   For filled point with black outline: shape = 21,
 #'   \code{colour = "black"}, \code{fill = "<fill>"},
 #'   tweak \code{stroke}.

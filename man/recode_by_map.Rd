@@ -2,7 +2,7 @@
 % Please edit documentation in R/2.manipulate_df.R
 \name{recode_by_map}
 \alias{recode_by_map}
-\title{Recode a Vector Using a Two‐Column Mapping Table}
+\title{Recode a Vector Using a Two-Column Mapping Table}
 \usage{
 recode_by_map(x, map_df, from, to)
 }

@@ -1,6 +1,6 @@
 Package: leo.basic
 Title: leo.basic
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: person("Ao", "Lu", email = "luao@stu.cqmu.edu.cn", role = c("aut", "cre"))
 Description: Basic function for leo universe.
 License: MIT + file LICENSE
@@ -32,6 +32,8 @@ Suggests:
     pak,
     patchwork,
     ReactomePA,
+    testthat (>= 3.0.0),
     vroom
+Config/testthat/edition: 3
 Remotes:
     github::showteeth/ggpie
