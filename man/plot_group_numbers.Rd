@@ -57,18 +57,28 @@ beeswarm arrangement, color / shape / size encoding, plus optional mean indicato
 }
 \note{
 \strong{Shape tips} (ggplot shape codes):
-\itemize{
-\item 24 = filled triangle up, 25 = filled triangle down, 22 = filled square; outline via \code{stroke}.
-\item 0 = open square, 2 = open triangle up, 6 = open triangle down.
-\item 3 = plus, 4 = cross/x, 1 = open circle; thin strokes, suit overlaps.
-\item 21-25 accept separate border (\code{colour}) and interior (\code{fill}).
+Run \verb{plot(0:25, pch = 0:25); text(0:25, labels = 0:25, pos = 3)}
+to preview every shape code.\tabular{llll}{
+   Code \tab Marker \tab Visual meaning \tab Best use \cr
+   24 \tab \ifelse{html}{\out{&#9650;}}{solid up-triangle} \tab solid triangle pointing up \tab filled point with border; use \code{stroke} for outline width \cr
+   25 \tab \ifelse{html}{\out{&#9660;}}{solid down-triangle} \tab solid triangle pointing down \tab filled point with border; use \code{stroke} for outline width \cr
+   22 \tab \ifelse{html}{\out{&#9632;}}{solid square} \tab solid square \tab filled point with border; use \code{stroke} for outline width \cr
+   0 \tab \ifelse{html}{\out{&#9633;}}{open square} \tab open square \tab outline-only marker \cr
+   2 \tab \ifelse{html}{\out{&#9651;}}{open up-triangle} \tab open triangle pointing up \tab outline-only marker \cr
+   6 \tab \ifelse{html}{\out{&#9661;}}{open down-triangle} \tab open triangle pointing down \tab outline-only marker \cr
+   3 \tab + \tab plus sign \tab thin marker for dense overlaps \cr
+   4 \tab x \tab x/cross sign \tab thin marker for dense overlaps \cr
+   1 \tab \ifelse{html}{\out{&#9675;}}{open circle} \tab open circle \tab thin marker for dense overlaps \cr
+}
+
+
+Shapes 21-25 accept separate border (\code{colour}) and interior (\code{fill}).
 For filled point with black outline: shape = 21,
 \code{colour = "black"}, \code{fill = "<fill>"},
 tweak \code{stroke}.
 Provide *_col or *_rule, or leave both NULL.
 Defaults: colour sig/pos=red, sig/neg=blue, else grey;
 shape 16; size 2.
-}
 }
 \examples{
 set.seed(1)

@@ -122,11 +122,23 @@ plot_pie <- function(x, colors = NULL, color_alpha = 1,
 #'
 #' @note
 #' **Shape tips** (ggplot shape codes):
-#' * 24 = filled triangle up, 25 = filled triangle down, 22 = filled square; outline via \code{stroke}.
-#' * 0 = open square, 2 = open triangle up, 6 = open triangle down.
-#' * 3 = plus, 4 = cross/x, 1 = open circle; thin strokes, suit overlaps.
-#' * 21-25 accept separate border (\code{colour}) and interior (\code{fill}).
-#'   For filled point with black outline: shape = 21,
+#' Run `plot(0:25, pch = 0:25); text(0:25, labels = 0:25, pos = 3)`
+#' to preview every shape code.
+#'
+#' | Code | Marker | Visual meaning | Best use |
+#' | --- | --- | --- | --- |
+#' | 24 | \ifelse{html}{\out{&#9650;}}{solid up-triangle} | solid triangle pointing up | filled point with border; use \code{stroke} for outline width |
+#' | 25 | \ifelse{html}{\out{&#9660;}}{solid down-triangle} | solid triangle pointing down | filled point with border; use \code{stroke} for outline width |
+#' | 22 | \ifelse{html}{\out{&#9632;}}{solid square} | solid square | filled point with border; use \code{stroke} for outline width |
+#' | 0 | \ifelse{html}{\out{&#9633;}}{open square} | open square | outline-only marker |
+#' | 2 | \ifelse{html}{\out{&#9651;}}{open up-triangle} | open triangle pointing up | outline-only marker |
+#' | 6 | \ifelse{html}{\out{&#9661;}}{open down-triangle} | open triangle pointing down | outline-only marker |
+#' | 3 | + | plus sign | thin marker for dense overlaps |
+#' | 4 | x | x/cross sign | thin marker for dense overlaps |
+#' | 1 | \ifelse{html}{\out{&#9675;}}{open circle} | open circle | thin marker for dense overlaps |
+#'
+#' Shapes 21-25 accept separate border (\code{colour}) and interior (\code{fill}).
+#' For filled point with black outline: shape = 21,
 #'   \code{colour = "black"}, \code{fill = "<fill>"},
 #'   tweak \code{stroke}.
 #' Provide *_col or *_rule, or leave both NULL.
