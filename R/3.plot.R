@@ -122,10 +122,10 @@ plot_pie <- function(x, colors = NULL, color_alpha = 1,
 #'
 #' @note
 #' **Shape tips** (ggplot shape codes):
-#' * 24, 25, 22: filled; outline via \code{stroke}.
-#' * 0, 2, 6: hollow.
-#' * 3, 4, 1: thin strokes, suit overlaps.
-#' * 21-25 accept border (\code{colour}) + fill.
+#' * 24 = filled triangle up, 25 = filled triangle down, 22 = filled square; outline via \code{stroke}.
+#' * 0 = open square, 2 = open triangle up, 6 = open triangle down.
+#' * 3 = plus, 4 = cross/x, 1 = open circle; thin strokes, suit overlaps.
+#' * 21-25 accept separate border (\code{colour}) and interior (\code{fill}).
 #'   For filled point with black outline: shape = 21,
 #'   \code{colour = "black"}, \code{fill = "<fill>"},
 #'   tweak \code{stroke}.

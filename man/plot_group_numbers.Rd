@@ -58,10 +58,10 @@ beeswarm arrangement, color / shape / size encoding, plus optional mean indicato
 \note{
 \strong{Shape tips} (ggplot shape codes):
 \itemize{
-\item 24, 25, 22: filled; outline via \code{stroke}.
-\item 0, 2, 6: hollow.
-\item 3, 4, 1: thin strokes, suit overlaps.
-\item 21-25 accept border (\code{colour}) + fill.
+\item 24 = filled triangle up, 25 = filled triangle down, 22 = filled square; outline via \code{stroke}.
+\item 0 = open square, 2 = open triangle up, 6 = open triangle down.
+\item 3 = plus, 4 = cross/x, 1 = open circle; thin strokes, suit overlaps.
+\item 21-25 accept separate border (\code{colour}) and interior (\code{fill}).
 For filled point with black outline: shape = 21,
 \code{colour = "black"}, \code{fill = "<fill>"},
 tweak \code{stroke}.
